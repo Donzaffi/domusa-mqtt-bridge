@@ -1,7 +1,7 @@
 import aiohttp
 
 class Auth:
-    BASE = "https://ic-api-app.azurewebsites.net"
+    BASE = "https://ic-api-app.azurewebsites.net/api"
 
     def __init__(self, username, password):
         self.username = username
