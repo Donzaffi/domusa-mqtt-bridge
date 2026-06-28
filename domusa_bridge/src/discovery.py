@@ -1,6 +1,5 @@
 import json
 
-
 class Discovery:
     def __init__(self, mqtt, device):
         self.mqtt = mqtt
@@ -20,7 +19,9 @@ class Discovery:
             "temperature_command_topic": f"domusa/{cid}/set/tempConsigna"
         }
 
-    await self.mqtt.client.publish(
+        # WICHTIG: Hier muss das await genau 8 Leerzeichen eingerückt sein, 
+        # damit es zum Block der async-Funktion gehört!
+        await self.mqtt.client.publish(
             f"homeassistant/climate/domusa_{cid}/config",
             json.dumps(payload),
             retain=True,
