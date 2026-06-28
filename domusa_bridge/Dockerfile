@@ -1,14 +1,16 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Install dependencies
+WORKDIR /app
+
 RUN apk add --no-cache python3 py3-pip
 
-WORKDIR /app
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
 
 COPY src/ /app/
 COPY requirements.txt /app/
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD [ "python3", "/app/main.py" ]
+CMD ["python", "/app/main.py"]
