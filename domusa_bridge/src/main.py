@@ -7,6 +7,9 @@ from discovery import Discovery
 from state import StateManager
 from router import Router
 from storage import Storage
+import json
+import sys
+import os
 
 
 async def poll_loop(api, state, device, cfg):
@@ -26,7 +29,7 @@ async def main():
     storage = Storage()
 
     # 2. AUTH
-    auth = Auth()
+    auth = Auth(config["username"], config["password"])
     token = await auth.get_token()
 
     # 3. API
