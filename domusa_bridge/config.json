@@ -2,9 +2,29 @@
   "name": "Domusa MQTT Bridge",
   "version": "1.0.0",
   "slug": "domusa_bridge",
-  "description": "Bridge for Domusa API to MQTT",
-  "startup": "once",
+  "description": "Bridge between Domusa API and MQTT for Home Assistant",
+
+  "arch": [
+    "amd64",
+    "aarch64",
+    "armv7",
+    "armhf",
+    "i386"
+  ],
+
+  "startup": "services",
   "boot": "auto",
+  "init": false,
+
+  "services": [
+    "mqtt:want"
+  ],
+
+  "options": {
+    "username": "",
+    "password": ""
+  },
+
   "schema": {
     "username": "str",
     "password": "password"
