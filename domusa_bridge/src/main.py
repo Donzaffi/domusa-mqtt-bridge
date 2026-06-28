@@ -50,7 +50,12 @@ async def main():
         await storage.save_device(device)
 
     # 5. MQTT
-    mqtt = MQTT()
+    mqtt = MQTT(
+        host=config.get("mqtt_host", "core-mosquitto"),
+        port=config.get("mqtt_port", 1883),
+        user=config.get("mqtt_user"),
+        password=config.get("mqtt_password")
+    )
     await mqtt.connect()
 
     # 6. DISCOVERY
