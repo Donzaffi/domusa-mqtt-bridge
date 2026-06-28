@@ -2,7 +2,7 @@
   "name": "Domusa MQTT Bridge",
   "version": "1.0.0",
   "slug": "domusa_bridge",
-  "description": "Bridge between Domusa API and MQTT for Home Assistant",
+  "description": "Bridge Domusa API ↔ MQTT with discovery support",
 
   "arch": [
     "amd64",
@@ -22,11 +22,13 @@
 
   "options": {
     "username": "",
-    "password": ""
+    "password": "",
+    "poll_interval": 60
   },
 
   "schema": {
     "username": "str",
-    "password": "password"
+    "password": "password",
+    "poll_interval": "int"
   }
 }
