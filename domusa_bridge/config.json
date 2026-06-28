@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "slug": "domusa_bridge",
   "description": "Bridge for Domusa API to MQTT",
+  "startup": "once",
+  "boot": "auto",
   "schema": {
     "username": "str",
     "password": "password"
-  },
-  "startup": "once",
-  "boot": "auto"
+  }
 }
