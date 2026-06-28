@@ -8,19 +8,17 @@ class Auth:
         self.username = username
         self.password = password
 
-    async def get_token(self):
-        async with aiohttp.ClientSession() as s:
-            r = await s.post(
-                f"{self.BASE}/v1/auth/login",
-                json={
-                    "username": self.username,
-                    "password": self.password,
-                    "idApp": "com.domusateknik.iconnect",
-                    "langDevice": "de"
-                }
-            )
-
-            data = await r.json()
-            print("LOGIN RESPONSE:", data)
-
-            return data["token"]
+async def get_token(self):
+    headers = {"Content-Type": "application/json"}
+    async with aiohttp.ClientSession(headers=headers) as s:
+        r = await s.post(
+            f"{self.BASE}/v1/auth/login",
+            json={
+                "username": self.username,
+                "password": self.password,
+                "langDevice": "de"
+            }
+        )
+        data = await r.json()
+        print("LOGIN RESPONSE:", data)
+        return data["content"]["token"]
