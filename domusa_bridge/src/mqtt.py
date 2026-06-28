@@ -1,12 +1,11 @@
+from aiomqtt import Client
+
+
 class MQTT:
     def __init__(self):
-        self.client = None
+        self.client = Client("core-mosquitto")
 
     async def connect(self):
-        self.client = Client(
-            hostname="core-mosquitto",
-            keepalive=60
-        )
         await self.client.__aenter__()
 
     async def publish(self, topic, payload):
