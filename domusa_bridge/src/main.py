@@ -1,49 +1,60 @@
-# FILE: domusa_bridge/src/main.py
-
 import asyncio
 
-from config import Config
 from auth import Auth
 from api import DomusaAPI
 from mqtt import MQTT
 from discovery import Discovery
-from climate import Climate
+from state import StateManager
 from router import Router
+from storage import Storage
+
+
+async def poll_loop(api, state, device, cfg):
+    while True:
+        try:
+            data = await api.get_estado(device["id"])
+            await state.publish(data)
+        except Exception as e:
+            print("Polling error:", e)
+
+        await asyncio.sleep(cfg["poll_interval"])
 
 
 async def main():
 
-    # 1. CONFIG
-    cfg = Config()
+    # 1. STORAGE (device persistent)
+    storage = Storage()
 
     # 2. AUTH
-    auth = Auth(cfg)
-    token = await auth.get_valid_token()
+    auth = Auth()
+    token = await auth.get_token()
 
     # 3. API
     api = DomusaAPI(token)
-    device = await api.get_caldera()
 
-    # 4. MQTT
+    # 4. DEVICE (ONLY ONCE)
+    device = await storage.get_device()
+    if not device:
+        device = await api.get_caldera()
+        await storage.save_device(device)
+
+    # 5. MQTT
     mqtt = MQTT()
     await mqtt.connect()
 
-    # 5. DISCOVERY
+    # 6. DISCOVERY (idempotent)
     discovery = Discovery(mqtt, device)
     await discovery.publish()
 
-    # 6. ROUTER (commands in background)
-    router = Router(api, mqtt, device, cfg)
+    # 7. STATE HANDLER
+    state = StateManager(mqtt, device)
+
+    # 8. ROUTER (commands)
+    router = Router(api, mqtt, device)
     asyncio.create_task(router.listen())
 
-    # 7. CLIMATE HANDLER
-    climate = Climate(api, mqtt, device, cfg)
-
-    # 8. MAIN LOOP (polling)
-    while True:
-        state = await api.get_estado(device["id"])
-        await climate.publish(state)
-        await asyncio.sleep(cfg.poll_interval)
+    # 9. POLLING LOOP
+    await poll_loop(api, state, device, {"poll_interval": 60})
 
 
 if __name__ == "__main__":
