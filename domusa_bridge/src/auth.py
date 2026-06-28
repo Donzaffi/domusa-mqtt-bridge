@@ -15,6 +15,7 @@ class Auth:
                 json={
                     "username": self.username,
                     "password": self.password,
+                    "idApp": "com.domusateknik.iconnect",
                     "langDevice": "de"
                 }
             )
