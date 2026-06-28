@@ -1,0 +1,12 @@
+{
+  "name": "Caldera MQTT Bridge",
+  "version": "1.0.0",
+  "slug": "caldera_mqtt",
+  "description": "Bridge für Caldera API zu MQTT",
+  "schema": {
+    "username": "str",
+    "password": "password"
+  },
+  "startup": "once",
+  "boot": "auto"
+}
