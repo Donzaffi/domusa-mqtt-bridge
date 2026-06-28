@@ -6,35 +6,26 @@ class Discovery:
         self.mqtt = mqtt
         self.device = device
 
-    async def publish_all(self):
-        device_id = self.device["id"]
+    async def publish(self):
+        cid = self.device["id"]
 
-        sensors = [
-            {
-                "name": "Temperature",
-                "key": "temperature",
-                "unit": "°C"
-            },
-            {
-                "name": "Power",
-                "key": "power"
+        payload = {
+            "name": "Domusa Heating",
+            "unique_id": f"domusa_{cid}",
+
+            "temperature_state_topic": f"domusa/{cid}/estado/tempActual",
+            "temperature_command_topic": f"domusa/{cid}/set/tempConsigna",
+
+            "mode_state_topic": f"domusa/{cid}/estado/modo",
+            "mode_command_topic": f"domusa/{cid}/set/mode",
+
+            "device": {
+                "identifiers": [cid],
+                "name": "Domusa Boiler"
             }
-        ]
+        }
 
-        for s in sensors:
-            topic = f"homeassistant/sensor/{device_id}_{s['key']}/config"
-
-            payload = {
-                "name": f"Domusa {s['name']}",
-                "state_topic": f"domusa/{device_id}/{s['key']}",
-                "unique_id": f"domusa_{device_id}_{s['key']}",
-                "device": {
-                    "identifiers": [device_id],
-                    "name": "Domusa Boiler"
-                }
-            }
-
-            if "unit" in s:
-                payload["unit_of_measurement"] = s["unit"]
-
-            await self.mqtt.publish(topic, json.dumps(payload))
+        await self.mqtt.publish(
+            f"homeassistant/climate/domusa_{cid}/config",
+            json.dumps(payload)
+        )
