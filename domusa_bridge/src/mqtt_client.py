@@ -1,7 +1,7 @@
 from aiomqtt import Client
 
 
-class MQTTClient:
+class MQTT:
     def __init__(self):
         self.client = Client("core-mosquitto")
 
