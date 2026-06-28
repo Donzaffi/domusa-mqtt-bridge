@@ -3,15 +3,9 @@
   "version": "1.0.0",
   "slug": "domusa_bridge",
 
-  "description": "Production MQTT bridge for Domusa heating API",
+  "description": "Stable MQTT bridge for Domusa API",
 
-  "arch": [
-    "amd64",
-    "aarch64",
-    "armv7",
-    "armhf",
-    "i386"
-  ],
+  "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
 
   "startup": "services",
   "boot": "auto",
@@ -22,14 +16,12 @@
   "options": {
     "username": "",
     "password": "",
-    "poll_interval": 60,
-    "zone": "cd"
+    "poll_interval": 60
   },
 
   "schema": {
     "username": "str",
     "password": "password",
-    "poll_interval": "int",
-    "zone": "str"
+    "poll_interval": "int"
   }
 }
