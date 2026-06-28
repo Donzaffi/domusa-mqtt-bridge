@@ -20,7 +20,8 @@ class Discovery:
             "temperature_command_topic": f"domusa/{cid}/set/tempConsigna"
         }
 
-        await self.mqtt.publish(
+    await self.mqtt.client.publish(
             f"homeassistant/climate/domusa_{cid}/config",
             json.dumps(payload),
+            retain=True,
         )
