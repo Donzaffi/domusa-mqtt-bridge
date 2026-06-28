@@ -16,7 +16,7 @@ class DomusaAPI:
         r = await self.session.get(f"{self.base}/v2/calderas/{cid}/estado")
         return await r.json()
 
-    async def set_temp(self, cid, value, zone):
+    async def set_temp(self, cid, value, zone="cd"):
         return await self.session.put(
             f"{self.base}/v2/calderas/{cid}/setTempManual",
             json={
