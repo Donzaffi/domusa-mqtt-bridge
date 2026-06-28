@@ -1,7 +1,8 @@
 #!/usr/bin/with-contenv bashio
 
-# Optional: Logging in HA anzeigen
 bashio::log.info "Starting Domusa MQTT Bridge..."
 
-# Starte das Python-Skript
+export USERNAME=$(bashio::config 'username')
+export PASSWORD=$(bashio::config 'password')
+
 python3 /app/main.py
