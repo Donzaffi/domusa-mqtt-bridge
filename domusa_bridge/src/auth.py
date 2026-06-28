@@ -23,4 +23,4 @@ class Auth:
             data = await r.json()
             print("LOGIN RESPONSE:", data)
 
-            return data["content"]["token"]
+            return data["token"]
