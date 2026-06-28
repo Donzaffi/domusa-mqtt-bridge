@@ -1,8 +1,8 @@
 {
-  "name": "Caldera MQTT Bridge",
+  "name": "Domusa MQTT Bridge",
   "version": "1.0.0",
   "slug": "caldera_mqtt",
-  "description": "Bridge für Caldera API zu MQTT",
+  "description": "Bridge for Domusa API to MQTT",
   "schema": {
     "username": "str",
     "password": "password"
