@@ -1,40 +1,40 @@
 import asyncio
-import json
 import os
-import aiohttp
-from aiomqtt import Client
 
-# Lade die Konfiguration aus den Home Assistant Optionen
-with open("/data/options.json") as f:
-    config = json.load(f)
+from auth import AuthManager
+from api import DomusaAPI
+from mqtt_client import MQTTClient
+from discovery import Discovery
+from state import StateManager
+from commands import CommandListener
 
-USERNAME = config.get("username")
-PASSWORD = config.get("password")
-MQTT_HOST = "core-mosquitto" # Standard Host in HA Add-ons
 
-class DomusaBridge:
-    def __init__(self):
-        self.session = None
-        self.token = None
+POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", "60"))
 
-    async def login(self):
-        url = "https://ic-api-app.azurewebsites.net/api/v1/auth/login" # Prüfe die URL deiner API!
-        payload = {"username": USERNAME, "password": PASSWORD, "langDevice": "es"}
-        async with self.session.post(url, json=payload) as resp:
-            data = await resp.json()
-            self.token = data.get("token")
-            # Hier auch die Geräte-ID abrufen und speichern!
 
-    async def run(self):
-        async with aiohttp.ClientSession() as self.session:
-            await self.login()
-            async with Client(MQTT_HOST) as mqtt:
-                while True:
-                    # 1. API Daten abrufen
-                    # 2. MQTT Discovery senden
-                    # 3. Status veröffentlichen
-                    await asyncio.sleep(60) # Interval
+async def main():
+    auth = AuthManager()
+    token = await auth.login()
+
+    api = DomusaAPI(token)
+    device = await api.get_device()
+
+    mqtt = MQTTClient()
+    await mqtt.connect()
+
+    discovery = Discovery(mqtt, device)
+    await discovery.publish_all()
+
+    state = StateManager(api, mqtt, device)
+
+    commands = CommandListener(api, mqtt, device)
+    await commands.start()
+
+    while True:
+        data = await api.get_state(device["id"])
+        await state.publish(data)
+        await asyncio.sleep(POLL_INTERVAL)
+
 
 if __name__ == "__main__":
-    bridge = DomusaBridge()
-    asyncio.run(bridge.run())
+    asyncio.run(main())
