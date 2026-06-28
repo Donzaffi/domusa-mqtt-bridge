@@ -1,4 +1,10 @@
 import asyncio
+import json
+import sys
+import os
+
+# Pfad-Fix für Importe
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from auth import Auth
 from api import DomusaAPI
@@ -7,10 +13,6 @@ from discovery import Discovery
 from state import StateManager
 from router import Router
 from storage import Storage
-import json
-import sys
-import os
-
 
 async def poll_loop(api, state, device, cfg):
     while True:
@@ -19,12 +21,10 @@ async def poll_loop(api, state, device, cfg):
             await state.publish(data)
         except Exception as e:
             print("Polling error:", e)
-
         await asyncio.sleep(cfg["poll_interval"])
 
-
 async def main():
-    # 1. KONFIGURATION LADEN (Das fehlende Stück!)
+    # 1. KONFIGURATION LADEN
     try:
         with open("/data/options.json", "r") as f:
             config = json.load(f)
@@ -32,16 +32,20 @@ async def main():
         print("Fehler: /data/options.json nicht gefunden!")
         return
 
-    # 2. STORAGE (device persistent)
-    storage = Storage()
-
-    # 3. AUTH - Jetzt ist 'config' definiert!
+    # 2. AUTH
     auth = Auth(config["username"], config["password"])
     token = await auth.get_token()
 
-    # 4. DEVICE (ONLY ONCE)
+    # 3. API INITIALISIEREN (Hier wird 'api' definiert!)
+    api = DomusaAPI(token)
+
+    # 4. STORAGE & DEVICE
+    storage = Storage()
     device = await storage.get_device()
+    
+    # Wenn kein Gerät im Storage, über API holen und speichern
     if not device:
+        print("Kein Gerät im Storage gefunden, frage API ab...")
         device = await api.get_caldera()
         await storage.save_device(device)
 
@@ -49,7 +53,7 @@ async def main():
     mqtt = MQTT()
     await mqtt.connect()
 
-    # 6. DISCOVERY (idempotent)
+    # 6. DISCOVERY
     discovery = Discovery(mqtt, device)
     await discovery.publish()
 
@@ -62,7 +66,6 @@ async def main():
 
     # 9. POLLING LOOP
     await poll_loop(api, state, device, {"poll_interval": 60})
-
 
 if __name__ == "__main__":
     asyncio.run(main())
