@@ -24,16 +24,20 @@ async def poll_loop(api, state, device, cfg):
 
 
 async def main():
+    # 1. KONFIGURATION LADEN (Das fehlende Stück!)
+    try:
+        with open("/data/options.json", "r") as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        print("Fehler: /data/options.json nicht gefunden!")
+        return
 
-    # 1. STORAGE (device persistent)
+    # 2. STORAGE (device persistent)
     storage = Storage()
 
-    # 2. AUTH
+    # 3. AUTH - Jetzt ist 'config' definiert!
     auth = Auth(config["username"], config["password"])
     token = await auth.get_token()
-
-    # 3. API
-    api = DomusaAPI(token)
 
     # 4. DEVICE (ONLY ONCE)
     device = await storage.get_device()
