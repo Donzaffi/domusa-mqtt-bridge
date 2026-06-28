@@ -1,18 +1,36 @@
 import aiohttp
+import time
+import json
+import os
 
 
-class AuthManager:
-    def __init__(self):
+class Auth:
+    def __init__(self, cfg):
+        self.cfg = cfg
         self.base_url = "https://ic-api-app.azurewebsites.net"
+        self.token_file = "/data/token.json"
 
     async def login(self):
-        async with aiohttp.ClientSession() as session:
-            payload = {
-                "username": __import__("os").getenv("USERNAME"),
-                "password": __import__("os").getenv("PASSWORD"),
-                "langDevice": "es"
-            }
+        async with aiohttp.ClientSession() as s:
+            r = await s.post(
+                f"{self.base_url}/v1/auth/login",
+                json={
+                    "username": self.cfg.username,
+                    "password": self.cfg.password,
+                    "langDevice": "es"
+                }
+            )
+            return await r.json()
 
-            async with session.post(f"{self.base_url}/api/v1/auth/login", json=payload) as r:
-                data = await r.json()
-                return data["token"]
+    async def get_valid_token(self):
+        data = await self.login()
+
+        token = {
+            "access": data["token"],
+            "expires": time.time() + 3600
+        }
+
+        with open(self.token_file, "w") as f:
+            json.dump(token, f)
+
+        return token["access"]
