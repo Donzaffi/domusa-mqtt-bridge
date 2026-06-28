@@ -15,7 +15,7 @@ class Auth:
                 json={
                     "username": self.username,
                     "password": self.password,
-                    "langDevice": "es"
+                    "langDevice": "de"
                 }
             )
 
