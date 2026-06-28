@@ -2,26 +2,28 @@
   "name": "Domusa MQTT Bridge",
   "version": "1.0.0",
   "slug": "domusa_bridge",
-
   "description": "Stable MQTT bridge for Domusa API",
-
   "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
-
   "startup": "services",
   "boot": "auto",
   "init": false,
-
   "services": ["mqtt:want"],
-
   "options": {
     "username": "",
     "password": "",
+    "mqtt_host": "core-mosquitto",
+    "mqtt_port": 1883,
+    "mqtt_user": "",
+    "mqtt_password": "",
     "poll_interval": 60
   },
-
   "schema": {
     "username": "str",
     "password": "password",
+    "mqtt_host": "str",
+    "mqtt_port": "port",
+    "mqtt_user": "str?",
+    "mqtt_password": "password?",
     "poll_interval": "int"
   }
 }
