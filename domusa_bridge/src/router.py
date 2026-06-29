@@ -13,10 +13,8 @@ class Router:
         await self.mqtt.client.subscribe(topic_pattern)
         print(f"Router: Abonniert auf {topic_pattern}")
 
-        # Direktes Iterieren über das messages-Objekt
         async for msg in self.mqtt.client.messages:
             try:
-                # Diese Zeilen sind korrekt um 16 Leerzeichen eingerückt
                 topic_str = str(msg.topic)
                 key = topic_str.split("/")[-1]
                 value = msg.payload.decode()
@@ -30,8 +28,7 @@ class Router:
                 elif key == "setACS":
                     url = f"{self.api.base}/v2/calderas/{cid}/perfiles"
                     await self.api.session.put(url, json={"acs": int(value)})
-                    print(f"Router: Warmwasser auf {value} gesetzt.")
+                    print(f"Router: Warmwasser an API gesendet: {value}")
 
             except Exception as e:
-                # Dieser Block ist um 12 Leerzeichen eingerückt
                 print(f"Router error beim Verarbeiten von {msg.topic}: {e}")
