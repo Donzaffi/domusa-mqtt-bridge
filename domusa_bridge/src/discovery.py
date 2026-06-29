@@ -14,21 +14,21 @@ class Discovery:
             "model": "HTEC Pro 12"
         }
 
+        # Zusammenfassung aller Sensoren (Status + Konfiguration)
         sensors = [
+            # Status-Sensoren
             {"name": "System Status", "uid": "status", "key": "alarma", "unit": None, "class": None, "icon": "mdi:heat-pump"},
-            {"name": "Sub-Alarm", "uid": "sub_alarma", "key": "sub_alarma", "unit": None, "class": None, "icon": "mdi:alert-circle-outline"},
-            {"name": "Außentemperatur", "uid": "s_ext", "key": "s_ext_c02", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
-            {"name": "Vorlauftemperatur", "uid": "s_ida", "key": "s_ida_hp_c08", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler"},
-            {"name": "Rücklauftemperatur", "uid": "s_ret", "key": "s_ret_hp_c07", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler-alert"},
-            {"name": "Warmwassertemperatur Ist", "uid": "s_acs", "key": "s_acs_c09", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater"},
             {"name": "Warmwassertemperatur Soll", "uid": "st_acs_soll", "key": "st_acs_p04", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater-marker"},
-            {"name": "Puffer-Heizung", "uid": "s_buffer", "key": "st_buffer_c_p123", "unit": "°C", "class": "temperature", "icon": "mdi:heating-coil"},
-            {"name": "Umgebungstemperatur", "uid": "s_amb", "key": "st_amb_p05", "unit": "°C", "class": "temperature", "icon": "mdi:home-thermometer"},
-            {"name": "Kompressor Frequenz", "uid": "freq", "key": "freq_c15", "unit": "Hz", "class": None, "icon": "mdi:frequency-converter"},
-            {"name": "Kompressor Strom", "uid": "curr", "key": "curr_comp_c21", "unit": "A", "class": "current", "icon": "mdi:current-ac"},
-            {"name": "Hochdruck", "uid": "pr_alta", "key": "s_pralta_c13", "unit": "bar", "class": "pressure", "icon": "mdi:gauge"},
-            {"name": "Niederdruck", "uid": "pr_baja", "key": "s_prbaja_c14", "unit": "bar", "class": "pressure", "icon": "mdi:gauge"},
-            {"name": "Netzspannung AC", "uid": "volt_ac", "key": "volt_ac_c23", "unit": "V", "class": "voltage", "icon": "mdi:lightning-bolt"}
+            
+            # Konfigurations-Sensoren (Sicherheit & Grenzwerte)
+            {"name": "Max Hochdruck", "uid": "max_pralta", "key": "max_pralta_p53", "unit": "bar", "class": "pressure", "icon": "mdi:gauge"},
+            {"name": "Min Niederdruck", "uid": "min_prbaja", "key": "min_prbaja_p54", "unit": "bar", "class": "pressure", "icon": "mdi:gauge"},
+            {"name": "Legionellen Temp", "uid": "st_legionela", "key": "st_legionela_p13", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer-alert"},
+            
+            # Konfigurations-Sensoren (Modi & Status)
+            {"name": "Warmwasser Modus", "uid": "m_acs", "key": "m_acs_p63", "unit": None, "class": "running", "icon": "mdi:water-boiler"},
+            {"name": "Nachtmodus", "uid": "m_noche", "key": "m_noche_p17", "unit": None, "class": "running", "icon": "mdi:weather-night"},
+            {"name": "OTC Regelung", "uid": "m_otc", "key": "m_otc_p19", "unit": None, "class": "running", "icon": "mdi:weather-partly-cloudy"}
         ]
 
         for s in sensors:
@@ -48,6 +48,7 @@ class Discovery:
                 retain=True
             )
 
+        # Der Slider (bleibt wie gehabt)
         acs_number_payload = {
             "name": "Domusa Warmwasser Soll",
             "unique_id": f"domusa_{cid}_acs_regler",
