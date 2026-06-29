@@ -16,15 +16,20 @@ class Router:
         # Direktes Iterieren über das messages-Objekt ohne 'async with'
         async for msg in self.mqtt.client.messages:
             try:
-                topic_str = str(msg.topic)
-                key = topic_str.split("/")[-1]
-                value = msg.payload.decode()
-                
-                print(f"Router: Nachricht empfangen auf {topic_str}: {value}")
-
+            topic_str = str(msg.topic)
+            key = topic_str.split("/")[-1]
+            value = msg.payload.decode()
+        
+                # Heizung (bestehend)
                 if key == "tempConsigna":
                     await self.api.set_temp(cid, float(value))
-                    print(f"Router: Temperatur erfolgreich auf {value} gesetzt.")
+            
+                # NEU: Warmwasser (ACS)
+                elif key == "setACS":
+                    # Endpunkt PUT /v2/calderas/{id}/perfiles
+                    url = f"{self.api.base}/v2/calderas/{cid}/perfiles"
+                    await self.api.session.put(url, json={"acs": int(value)})
+                    print(f"Router: Warmwasser auf {value} gesetzt.")
 
             except Exception as e:
-                print(f"Router error beim Verarbeiten von {msg.topic}: {e}")
+                print(f"Router error: {e}")
