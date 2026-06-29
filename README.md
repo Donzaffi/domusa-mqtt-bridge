@@ -32,13 +32,13 @@ This project is an independent, community-driven integration and is **not offici
 
 After installation, go to the **Configuration** tab of the add-on to provide your credentials and MQTT settings:
 
-´´´yaml
+```yaml
 mqtt_broker: "core-mosquitto"
 mqtt_port: 1883
 mqtt_user: "your_mqtt_username"
 mqtt_password: "your_mqtt_password"
 domusa_user: "your_domusa_app_email"
-domusa_password: "your_domusa_app_password"´´´
+domusa_password: "your_domusa_app_password" ```
 
 *Note: Your credentials are used locally by the add-on to authenticate with the Domusa API and are not shared with any third party.*
 
