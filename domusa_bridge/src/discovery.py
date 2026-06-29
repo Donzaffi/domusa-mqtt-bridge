@@ -14,6 +14,11 @@ class Discovery:
             "model": "HTEC Pro 12"
         }
 
+        # 1. ZUERST: Die alte 'number' Entität (Slider) explizit im MQTT-Broker löschen
+        # Dies ist notwendig, damit Home Assistant sie aus der Liste entfernt
+        await self.mqtt.client.publish(f"homeassistant/number/domusa_{cid}_acs_regler/config", None, retain=True)
+
+        # 2. Alle Sensoren definieren
         sensors = [
             {"name": "System Status", "uid": "status", "key": "alarma", "unit": None, "class": None, "icon": "mdi:heat-pump"},
             {"name": "Sub-Alarm", "uid": "sub_alarma", "key": "sub_alarma", "unit": None, "class": None, "icon": "mdi:alert-circle-outline"},
@@ -42,9 +47,13 @@ class Discovery:
                 "device_class": s['class'],
                 "icon": s['icon']
             }
-            await self.mqtt.client.publish(f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", json.dumps(payload), retain=True)
+            await self.mqtt.client.publish(
+                f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", 
+                json.dumps(payload), 
+                retain=True
+            )
 
-        # Verbessertes Climate-Widget
+        # 3. Das Climate-Widget anlegen
         climate_payload = {
             "name": "Domusa Warmwasser",
             "unique_id": f"domusa_{cid}_acs_thermostat",
