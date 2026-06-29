@@ -7,37 +7,44 @@ class Discovery:
 
     async def publish(self):
         cid = self.device["id"]
-        dev_info = {"identifiers": [cid], "name": "Domusa HTEC", "manufacturer": "Domusa", "model": "HTEC Pro 12"}
+        # Wir verwenden eine eindeutige ID, damit HA alles als ein Gerät erkennt
+        dev_info = {
+            "identifiers": [f"domusa_htec_{cid}"], 
+            "name": "Domusa HTEC", 
+            "manufacturer": "Domusa", 
+            "model": "HTEC Pro 12"
+        }
 
         sensors = [
-            # Temperaturen (div 1)
-            {"name": "Verdampfertemperatur", "uid": "s_evap", "key": "s_evap_c00", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "Verdichter Druckgastemperatur", "uid": "s_discharge", "key": "s_discharge_c01", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "Sauggastemperatur", "uid": "s_suction", "key": "s_suction_c03", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "Kondensatortemperatur", "uid": "s_condens", "key": "s_condens_c06", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "Heizung Solltemperatur", "uid": "st_heat", "key": "st_c_p02", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:radiator"},
-            {"name": "Kühlung Solltemperatur", "uid": "st_cool", "key": "st_f_p03", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:snowflake"},
-            {"name": "Aktiver Heizsollwert", "uid": "st_active_heat", "key": "st_activa_c_f", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:radiator"},
-            {"name": "Aktiver Warmwasser Sollwert", "uid": "st_active_acs", "key": "st_activa_acs", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:water-thermometer"},
-            {"name": "Kompressor IPM Temperatur", "uid": "ipm_temp", "key": "s_ipm_c22", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "T6 Temperatur", "uid": "t6_temp", "key": "s_t6_c25", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "Externer Zonenfühler", "uid": "zone_ext_temp", "key": "s_zonaext_c75", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
-            {"name": "Temperaturdifferenz", "uid": "delta_t", "key": "dt_hp_c11", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:thermometer"},
+            # Temperaturen
+            {"name": "Verdampfertemperatur", "uid": "s_evap", "key": "s_evap_c00", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "Verdichter Druckgastemperatur", "uid": "s_discharge", "key": "s_discharge_c01", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "Sauggastemperatur", "uid": "s_suction", "key": "s_suction_c03", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "Kondensatortemperatur", "uid": "s_condens", "key": "s_condens_c06", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "Heizung Solltemperatur", "uid": "st_heat", "key": "st_c_p02", "unit": "°C", "class": "temperature", "icon": "mdi:radiator"},
+            {"name": "Kühlung Solltemperatur", "uid": "st_cool", "key": "st_f_p03", "unit": "°C", "class": "temperature", "icon": "mdi:snowflake"},
+            {"name": "Aktiver Heizsollwert", "uid": "st_active_heat", "key": "st_activa_c_f", "unit": "°C", "class": "temperature", "icon": "mdi:radiator"},
+            {"name": "Aktiver Warmwasser Sollwert", "uid": "st_active_acs", "key": "st_activa_acs", "unit": "°C", "class": "temperature", "icon": "mdi:water-thermometer"},
+            {"name": "Kompressor IPM Temperatur", "uid": "ipm_temp", "key": "s_ipm_c22", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "T6 Temperatur", "uid": "t6_temp", "key": "s_t6_c25", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "Externer Zonenfühler", "uid": "zone_ext_temp", "key": "s_zonaext_c75", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
+            {"name": "Temperaturdifferenz", "uid": "delta_t", "key": "dt_hp_c11", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
             
             # Elektrische Werte & Sonstige
-            {"name": "Kompressor Phasenstrom", "uid": "phase_current", "key": "curr_ph_comp", "unit": "A", "class": "current", "div": 1, "icon": "mdi:current-ac"},
-            {"name": "Zwischenkreisspannung", "uid": "volt_dc", "key": "volt_dc_c24", "unit": "V", "class": "voltage", "div": 1, "icon": "mdi:flash"},
-            {"name": "Lüfter 1 Drehzahl", "uid": "fan1_rpm", "key": "rpm_vent1_c16", "unit": "rpm", "class": None, "div": 1, "icon": "mdi:fan"},
-            {"name": "Lüfter 2 Drehzahl", "uid": "fan2_rpm", "key": "rpm_vent2_c17", "unit": "rpm", "class": None, "div": 1, "icon": "mdi:fan"},
-            {"name": "EEV Position", "uid": "eev_position", "key": "eev_c18", "unit": "steps", "class": None, "div": 1, "icon": "mdi:valve"},
-            {"name": "PWM Ventil", "uid": "pwm", "key": "pwm_c1_c51", "unit": "%", "class": None, "div": 1, "icon": "mdi:percent"},
-            {"name": "Wärmeleistung", "uid": "thermal_power", "key": "s_q_c10", "unit": "kW", "class": "power", "div": 1, "icon": "mdi:flash-circle"},
-            {"name": "Betriebszustand", "uid": "operation_state", "key": "estado_func_c52", "unit": None, "class": None, "div": 1, "icon": "mdi:state-machine"},
-            {"name": "Wärmepumpenmodus", "uid": "hp_mode", "key": "m_hp_p01", "unit": None, "class": None, "div": 1, "icon": "mdi:cog"},
-            {"name": "Netzfrequenz", "uid": "grid_frequency", "key": "e_freq", "unit": "Hz", "class": "frequency", "div": 1, "icon": "mdi:sine-wave"},
-            {"name": "Heizkreis Zone 1 Soll", "uid": "zone1_heat_setpoint", "key": "st_zona1_c_p158", "unit": "°C", "class": "temperature", "div": 1, "icon": "mdi:radiator"}
+            {"name": "Kompressor Phasenstrom", "uid": "phase_current", "key": "curr_ph_comp", "unit": "A", "class": "current", "icon": "mdi:current-ac"},
+            {"name": "Zwischenkreisspannung", "uid": "volt_dc", "key": "volt_dc_c24", "unit": "V", "class": "voltage", "icon": "mdi:flash"},
+            {"name": "Lüfter 1 Drehzahl", "uid": "fan1_rpm", "key": "rpm_vent1_c16", "unit": "rpm", "class": None, "icon": "mdi:fan"},
+            {"name": "Lüfter 2 Drehzahl", "uid": "fan2_rpm", "key": "rpm_vent2_c17", "unit": "rpm", "class": None, "icon": "mdi:fan"},
+            {"name": "EEV Position", "uid": "eev_position", "key": "eev_c18", "unit": "steps", "class": None, "icon": "mdi:valve"},
+            {"name": "PWM Ventil", "uid": "pwm", "key": "pwm_c1_c51", "unit": "%", "class": None, "icon": "mdi:percent"},
+            {"name": "Wärmeleistung", "uid": "thermal_power", "key": "s_q_c10", "unit": "kW", "class": "power", "icon": "mdi:flash-circle"},
+            {"name": "Betriebszustand", "uid": "operation_state", "key": "estado_func_c52", "unit": None, "class": None, "icon": "mdi:state-machine"},
+            {"name": "Wärmepumpenmodus", "uid": "hp_mode", "key": "m_hp_p01", "unit": None, "class": None, "icon": "mdi:cog"},
+            {"name": "Netzfrequenz", "uid": "grid_frequency", "key": "e_freq", "unit": "Hz", "class": "frequency", "icon": "mdi:sine-wave"},
+            {"name": "Heizkreis Zone 1 Soll", "uid": "zone1_heat_setpoint", "key": "st_zona1_c_p158", "unit": "°C", "class": "temperature", "icon": "mdi:radiator"}
         ]
 
+        # Sensoren veröffentlichen
         for s in sensors:
             payload = {
                 "name": f"Domusa {s['name']}",
@@ -52,6 +59,7 @@ class Discovery:
             }
             await self.mqtt.client.publish(f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", json.dumps(payload), retain=True)
 
+        # Climate-Gerät veröffentlichen
         climate = {
             "name": "Domusa Warmwasser",
             "unique_id": f"domusa_{cid}_acs_thermostat",
