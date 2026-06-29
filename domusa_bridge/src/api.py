@@ -25,8 +25,18 @@ class DomusaAPI:
 
     async def get_estado(self, cid):
         url = f"{self.base}/v2/calderas/{cid}/estado"
-        async with self.session.get(url) as r:
-            return await r.json()
+        try:
+            async with self.session.get(url) as r:
+                return await r.json() if r.status == 200 else {}
+        except: return {}
+
+    # NEU HINZUGEFÜGT:
+    async def get_config(self, cid):
+        url = f"{self.base}/v2/calderas/{cid}/configuracion"
+        try:
+            async with self.session.get(url) as r:
+                return await r.json() if r.status == 200 else {}
+        except: return {}
 
     async def set_temp(self, cid, value, zone="cd"):
         url = f"{self.base}/v2/calderas/{cid}/setTempManual"
