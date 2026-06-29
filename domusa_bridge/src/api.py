@@ -14,40 +14,21 @@ class DomusaAPI:
         url = f"{self.base}/v1/usuario/calderas/aliases"
         try:
             async with self.session.get(url) as r:
-                if r.status != 200:
-                    print(f"API Fehler: Status {r.status}")
-                    return None
+                if r.status != 200: return None
                 data = await r.json()
-                print(f"DEBUG: API Alias Antwort: {data}")
-                
                 if isinstance(data, dict) and data:
                     first_key = list(data.keys())[0]
-                    # Versuche ID zu extrahieren
                     id_wert = data[first_key].get("idcaldera", first_key)
                     return {"id": id_wert}
                 return None
-        except Exception as e:
-            print(f"Fehler in get_caldera: {e}")
-            return None
+        except: return None
 
     async def get_estado(self, cid):
         url = f"{self.base}/v2/calderas/{cid}/estado"
         async with self.session.get(url) as r:
             return await r.json()
 
-    # NEU: Methode zum Abruf der Konfigurationsdaten
-    async def get_config(self, cid):
-        url = f"{self.base}/v2/calderas/{cid}/configuracion"
-        async with self.session.get(url) as r:
-            if r.status == 200:
-                return await r.json()
-            else:
-                print(f"API Fehler beim Abruf der Konfiguration: {r.status}")
-                return {}
-
     async def set_temp(self, cid, value, zone="cd"):
-        # Hinweis: Dein Code hatte hier POST, aber laut API-Spec sollte es PUT sein. 
-        # Falls es mit POST funktioniert, lass es so. Falls nicht, ändere .post zu .put
         url = f"{self.base}/v2/calderas/{cid}/setTempManual"
         async with self.session.put(url, json={
             "zona": zone,
