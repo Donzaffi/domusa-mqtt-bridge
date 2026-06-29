@@ -3,20 +3,22 @@
 [![GitHub Issues](https://img.shields.io/github/issues/Donzaffi/domusa-mqtt-bridge)](https://github.com/Donzaffi/domusa-mqtt-bridge/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This Home Assistant Add-on provides a bridge between your **Domusa heating system** and an **MQTT broker**. It allows you to monitor and control your heating system locally within Home Assistant without relying on third-party cloud services.
+This Home Assistant Add-on acts as a bridge between your **Domusa heating system** and your local **MQTT broker**. It retrieves data from the Domusa cloud API and makes it available within Home Assistant for visualization and automation.
 
-## Features
+## How it works
 
-*   **Real-time Monitoring:** Get live data from your Domusa unit directly into Home Assistant.
-*   **Full Local Control:** Manage your heating settings via MQTT.
-*   **Privacy Focused:** Runs locally on your Home Assistant instance; no external cloud dependency.
-*   **Easy Integration:** Designed as a Home Assistant Add-on for seamless deployment.
+This add-on bridges the gap between the manufacturer's cloud service and your local smart home:
 
-## Prerequisites
+* **Cloud API Integration:** The add-on communicates with the official Domusa cloud API (hosted on Azure) to fetch system status and send commands.
+* **Local MQTT:** Once the data is retrieved, it is published to your local MQTT broker. This allows you to integrate your heating data seamlessly into Home Assistant dashboards and automations.
+* **Requirements:** A stable internet connection is required for the bridge to communicate with the Domusa cloud services.
 
-*   A running Home Assistant instance.
-*   An MQTT Broker (e.g., Mosquitto) installed and configured in Home Assistant.
-*   Your Domusa device accessible on your local network.
+## Disclaimer
+
+This project is an independent, community-driven integration and is **not officially affiliated with or endorsed by Domusa**. 
+
+* **Cloud Dependency:** This is not a local-only (LAN) integration. It relies on the manufacturer's cloud API.
+* **Use at your own risk:** As this project relies on an undocumented or official cloud API, changes to the manufacturer's infrastructure or firmware updates may affect the functionality of this add-on. 
 
 ## Installation
 
@@ -24,16 +26,16 @@ This Home Assistant Add-on provides a bridge between your **Domusa heating syste
 2.  Click the **three-dot menu** in the top right corner and select **Repositories**.
 3.  Add this repository URL: `https://github.com/Donzaffi/domusa-mqtt-bridge`
 4.  Click **Add** and then **Close**.
-5.  Refresh the Add-on store page. The **Domusa MQTT Bridge** will appear in the list.
-6.  Click on the Add-on and select **Install**.
+5.  Search for **Domusa MQTT Bridge** in the Add-on store and click **Install**.
 
 ## Configuration
 
-After installation, go to the **Configuration** tab of the add-on and provide your MQTT connection details:
+After installation, go to the **Configuration** tab of the add-on to provide your credentials and MQTT settings:
 
 ```yaml
 mqtt_broker: "core-mosquitto"
 mqtt_port: 1883
-mqtt_user: "your_username"
-mqtt_password: "your_password"
-# Add your specific device settings here
+mqtt_user: "your_mqtt_username"
+mqtt_password: "your_mqtt_password"
+domusa_user: "your_domusa_app_email"
+domusa_password: "your_domusa_app_password"
