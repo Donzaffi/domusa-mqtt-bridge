@@ -14,15 +14,14 @@ class Discovery:
             "model": "HTEC Pro 12"
         }
 
-        # Vollständige, bereinigte Liste (ohne die fehlenden Konfig-Werte)
         sensors = [
             {"name": "System Status", "uid": "status", "key": "alarma", "unit": None, "class": None, "icon": "mdi:heat-pump"},
             {"name": "Sub-Alarm", "uid": "sub_alarma", "key": "sub_alarma", "unit": None, "class": None, "icon": "mdi:alert-circle-outline"},
             {"name": "Außentemperatur", "uid": "s_ext", "key": "s_ext_c02", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
             {"name": "Vorlauftemperatur", "uid": "s_ida", "key": "s_ida_hp_c08", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler"},
             {"name": "Rücklauftemperatur", "uid": "s_ret", "key": "s_ret_hp_c07", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler-alert"},
-            {"name": "Warmwassertemperatur Ist", "uid": "s_acs", "key": "s_acs_c09", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater"},
-            {"name": "Warmwassertemperatur Soll", "uid": "st_acs_soll", "key": "st_acs_p04", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater-marker"},
+            {"name": "Warmwassertemperatur Ist", "uid": "s_acs", "key": "s_acs_c09", "unit": "°C", "class": "temperature", "icon": "mdi:water-thermometer"},
+            {"name": "Warmwassertemperatur Soll", "uid": "st_acs_soll", "key": "st_acs_p04", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler-marker"},
             {"name": "Puffer-Heizung", "uid": "s_buffer", "key": "st_buffer_c_p123", "unit": "°C", "class": "temperature", "icon": "mdi:heating-coil"},
             {"name": "Umgebungstemperatur", "uid": "s_amb", "key": "st_amb_p05", "unit": "°C", "class": "temperature", "icon": "mdi:home-thermometer"},
             {"name": "Kompressor Frequenz", "uid": "freq", "key": "freq_c15", "unit": "Hz", "class": None, "icon": "mdi:frequency-converter"},
@@ -45,12 +44,11 @@ class Discovery:
             }
             await self.mqtt.client.publish(f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", json.dumps(payload), retain=True)
 
-        # Änderung: Slider durch 'climate' (Thermostat) ersetzt
+        # Verbessertes Climate-Widget
         climate_payload = {
             "name": "Domusa Warmwasser",
             "unique_id": f"domusa_{cid}_acs_thermostat",
             "device": device_info,
-            "mode_command_topic": None, # Wenn deine API keine Modi unterstützt
             "temperature_command_topic": f"domusa/{cid}/set/setACS",
             "current_temperature_topic": f"domusa/{cid}/status",
             "current_temperature_template": "{{ value_json.s_acs_c09 }}",
@@ -59,6 +57,6 @@ class Discovery:
             "min_temp": 30,
             "max_temp": 70,
             "temp_step": 1,
-            "device_class": None
+            "icon": "mdi:water-boiler-marker"
         }
         await self.mqtt.client.publish(f"homeassistant/climate/domusa_{cid}_acs_thermostat/config", json.dumps(climate_payload), retain=True)
