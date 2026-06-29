@@ -16,6 +16,7 @@ class Router:
         # Direktes Iterieren über das messages-Objekt
         async for msg in self.mqtt.client.messages:
             try:
+                # Diese Zeilen sind korrekt um 16 Leerzeichen eingerückt
                 topic_str = str(msg.topic)
                 key = topic_str.split("/")[-1]
                 value = msg.payload.decode()
@@ -26,12 +27,11 @@ class Router:
                     await self.api.set_temp(cid, float(value))
                     print(f"Router: Temperatur erfolgreich auf {value} gesetzt.")
                 
-                # Hier kannst du später weitere Keys hinzufügen
                 elif key == "setACS":
-                    # Beispiel für die Erweiterung
-                    print(f"Router: Befehl setACS erhalten: {value}")
-                    # await self.api.set_acs(...)
+                    url = f"{self.api.base}/v2/calderas/{cid}/perfiles"
+                    await self.api.session.put(url, json={"acs": int(value)})
+                    print(f"Router: Warmwasser auf {value} gesetzt.")
 
             except Exception as e:
-                # Dieser Block ist nun korrekt eingerückt und fängt Fehler ab
+                # Dieser Block ist um 12 Leerzeichen eingerückt
                 print(f"Router error beim Verarbeiten von {msg.topic}: {e}")
