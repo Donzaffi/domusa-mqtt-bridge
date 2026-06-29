@@ -36,13 +36,14 @@ async def main():
     auth = Auth(config["username"], config["password"])
     token = await auth.get_token()
 
-    # 3. API INITIALISIEREN (Hier wird 'api' definiert!)
+    # 3. API INITIALISIEREN
     api = DomusaAPI(token)
 
     # 4. STORAGE & DEVICE
-storage = Storage()
+    storage = Storage()
     device = await storage.get_device()
     
+    # Wenn kein Gerät im Storage, über API holen und speichern
     if not device:
         print("Kein Gerät im Storage gefunden, frage API ab...")
         device = await api.get_caldera()
@@ -50,7 +51,7 @@ storage = Storage()
             await storage.save_device(device)
         else:
             print("KRITISCHER FEHLER: API konnte keine Caldera finden.")
-            return # Programm beenden, nicht weiterlaufen!
+            return
 
     # 5. MQTT
     mqtt = MQTT(
