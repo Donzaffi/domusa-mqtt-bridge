@@ -59,9 +59,9 @@ class Discovery:
             "device": dev_info,
             "temperature_command_topic": f"domusa/{cid}/set/setACS",
             "current_temperature_topic": f"domusa/{cid}/status",
-            "current_temperature_template": "{{ (value_json.s_acs_c09 | float) / 10 }}",
+            "current_temperature_template": "{{ (value_json.s_acs_c09}}",
             "temperature_state_topic": f"domusa/{cid}/status",
-            "temperature_state_template": "{{ (value_json.st_acs_p04 | float) / 10 }}",
+            "temperature_state_template": "{{ (value_json.st_acs_p04}}",
             "min_temp": 30, "max_temp": 70, "temp_step": 1,
             "icon": "mdi:water-boiler-marker"
         }
