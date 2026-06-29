@@ -14,7 +14,7 @@ class Discovery:
             "model": "HTEC Pro 12"
         }
 
-        # Dies ist die VOLLSTÄNDIGE Liste aller Sensoren
+        # Vollständige, bereinigte Liste (ohne die fehlenden Konfig-Werte)
         sensors = [
             {"name": "System Status", "uid": "status", "key": "alarma", "unit": None, "class": None, "icon": "mdi:heat-pump"},
             {"name": "Sub-Alarm", "uid": "sub_alarma", "key": "sub_alarma", "unit": None, "class": None, "icon": "mdi:alert-circle-outline"},
@@ -43,24 +43,22 @@ class Discovery:
                 "device_class": s['class'],
                 "icon": s['icon']
             }
-            await self.mqtt.client.publish(
-                f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", 
-                json.dumps(payload), 
-                retain=True
-            )
+            await self.mqtt.client.publish(f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", json.dumps(payload), retain=True)
 
-        # Der Regler für Warmwasser
-        acs_payload = {
-            "name": "Domusa Warmwasser Soll",
-            "unique_id": f"domusa_{cid}_acs_regler",
+        # Änderung: Slider durch 'climate' (Thermostat) ersetzt
+        climate_payload = {
+            "name": "Domusa Warmwasser",
+            "unique_id": f"domusa_{cid}_acs_thermostat",
             "device": device_info,
-            "state_topic": f"domusa/{cid}/status",
-            "command_topic": f"domusa/{cid}/set/setACS",
-            "value_template": "{{ value_json.st_acs_p04 }}",
-            "min": 30,
-            "max": 70,
-            "unit_of_measurement": "°C",
-            "device_class": "temperature",
-            "icon": "mdi:water-heater-marker"
+            "mode_command_topic": None, # Wenn deine API keine Modi unterstützt
+            "temperature_command_topic": f"domusa/{cid}/set/setACS",
+            "current_temperature_topic": f"domusa/{cid}/status",
+            "current_temperature_template": "{{ value_json.s_acs_c09 }}",
+            "temperature_state_topic": f"domusa/{cid}/status",
+            "temperature_state_template": "{{ value_json.st_acs_p04 }}",
+            "min_temp": 30,
+            "max_temp": 70,
+            "temp_step": 1,
+            "device_class": None
         }
-        await self.mqtt.client.publish(f"homeassistant/number/domusa_{cid}_acs_regler/config", json.dumps(acs_payload), retain=True)
+        await self.mqtt.client.publish(f"homeassistant/climate/domusa_{cid}_acs_thermostat/config", json.dumps(climate_payload), retain=True)
