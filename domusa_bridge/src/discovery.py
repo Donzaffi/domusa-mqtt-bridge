@@ -22,7 +22,7 @@ class Discovery:
             {"name": "Außentemperatur", "uid": "s_ext", "key": "s_ext_c02", "unit": "°C", "class": "temperature", "icon": "mdi:thermometer"},
             {"name": "Vorlauftemperatur", "uid": "s_ida", "key": "s_ida_hp_c08", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler"},
             {"name": "Rücklauftemperatur", "uid": "s_ret", "key": "s_ret_hp_c07", "unit": "°C", "class": "temperature", "icon": "mdi:water-boiler-alert"},
-            {"name": "Warmwassertemperatur", "uid": "s_acs", "key": "s_acs_c09", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater"},
+            {"name": "Warmwassertemperatur Ist", "uid": "s_acs", "key": "s_acs_c09", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater"},
             {"name": "Warmwassertemperatur Soll", "uid": "st_acs_soll", "key": "st_activa_acs", "unit": "°C", "class": "temperature", "icon": "mdi:water-heater-marker"},
             {"name": "Puffer-Heizung", "uid": "s_buffer", "key": "st_buffer_c_p123", "unit": "°C", "class": "temperature", "icon": "mdi:heating-coil"},
             {"name": "Umgebungstemperatur", "uid": "s_amb", "key": "st_amb_p05", "unit": "°C", "class": "temperature", "icon": "mdi:home-thermometer"},
