@@ -7,7 +7,6 @@ class Discovery:
 
     async def publish(self):
         cid = self.device["id"]
-        # Gemeinsame Geräte-Informationen
         device_info = {
             "identifiers": [cid],
             "name": "Domusa HTEC Pro 12",
@@ -15,7 +14,6 @@ class Discovery:
             "model": "HTEC Pro 12"
         }
 
-        # Definition aller Sensoren
         sensors = [
             {"name": "System Status", "uid": "status", "key": "alarma", "unit": None, "class": None, "icon": "mdi:heat-pump"},
             {"name": "Sub-Alarm", "uid": "sub_alarma", "key": "sub_alarma", "unit": None, "class": None, "icon": "mdi:alert-circle-outline"},
@@ -33,7 +31,6 @@ class Discovery:
             {"name": "Netzspannung AC", "uid": "volt_ac", "key": "volt_ac_c23", "unit": "V", "class": "voltage", "icon": "mdi:lightning-bolt"}
         ]
 
-        # Sende Discovery für jeden Sensor
         for s in sensors:
             payload = {
                 "name": f"Domusa {s['name']}",
@@ -50,9 +47,7 @@ class Discovery:
                 json.dumps(payload), 
                 retain=True
             )
-            print(f"Discovery für Sensor {s['name']} gesendet.")
 
-        # Warmwasser-Regler (number-Entität) hinzufügen
         acs_number_payload = {
             "name": "Domusa Warmwasser Soll",
             "unique_id": f"domusa_{cid}_acs_regler",
@@ -60,6 +55,7 @@ class Discovery:
             "state_topic": f"domusa/{cid}/status",
             "value_template": "{{ value_json.st_activa_acs }}",
             "command_topic": f"domusa/{cid}/set/setACS",
+            "optimistic": True,
             "min": 30,
             "max": 70,
             "unit_of_measurement": "°C",
@@ -71,4 +67,3 @@ class Discovery:
             json.dumps(acs_number_payload), 
             retain=True
         )
-        print("Discovery für Warmwasser-Regler gesendet.")
