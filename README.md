@@ -39,3 +39,10 @@ mqtt_user: "your_mqtt_username"
 mqtt_password: "your_mqtt_password"
 domusa_user: "your_domusa_app_email"
 domusa_password: "your_domusa_app_password"
+
+### Sensor Naming
+The sensors provided by this add-on are currently named in German. If you prefer a different language, you can easily rename the entities directly within Home Assistant:
+1. Go to **Settings** -> **Devices & Services** -> **Entities**.
+2. Find the sensor you want to rename.
+3. Click on the sensor name and change it to your preferred language.
+Home Assistant will remember these custom names even after updates.
