@@ -32,7 +32,7 @@ class Discovery:
             {"name": "Betriebszustand", "uid": "operation_state", "key": "estado_func_c52", "unit": None, "class": None, "icon": "mdi:cog"},
             {"name": "Wärmepumpenmodus", "uid": "hp_mode", "key": "m_hp_p01", "unit": None, "class": None, "icon": "mdi:heat-pump"},
             {"name": "Netzfrequenz", "uid": "grid_frequency", "key": "e_freq", "unit": "Hz", "class": "frequency", "icon": "mdi:sine-wave"},
-            {"name": "Heizkreis Zone 1 Soll", "uid": "zone1_heat_setpoint", "key": "st_zona1_c_p158", "unit": "°C", "class": "temperature", "icon": "mdi:home-thermometer"},
+            {"name": "Heizkreis Zone 1 Soll", "uid": "zone1_heat_setpoint", "key": "st_zona1_c_p158", "unit": "°C", "class": "temperature", "icon": "mdi:home-thermometer"}
         ]
 
         for s in sensors:
@@ -49,7 +49,6 @@ class Discovery:
             }
             await self.mqtt.client.publish(f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", json.dumps(payload), retain=True)
 
-        # Das Climate-Widget für Warmwasser
         climate = {
             "name": "Domusa Warmwasser",
             "unique_id": f"domusa_{cid}_acs_thermostat",
