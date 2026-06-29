@@ -13,24 +13,28 @@ from state import StateManager
 from router import Router
 from storage import Storage
 
+def log(msg):
+    print(f"DEBUG: {msg}")
+    sys.stdout.flush()
+
 async def poll_loop(api, state, device, cfg):
     while True:
-        try:
-            estado = await api.get_estado(device["id"])
-            config = await api.get_config(device["id"])
-            full_data = {**(estado or {}), **(config or {})}
-            if full_data:
-                await state.publish(full_data)
-        except Exception as e:
-            print(f"Polling error: {e}")
+        log("Starte Datenabfrage...")
+        estado = await api.get_estado(device["id"])
+        config = await api.get_config(device["id"])
+        
+        full_data = {**(estado or {}), **(config or {})}
+        
+        if full_data:
+            log(f"Sende {len(full_data)} Sensoren an MQTT")
+            await state.publish(full_data)
+        else:
+            log("Warnung: Keine Daten von der API erhalten!")
+            
         await asyncio.sleep(cfg.get("poll_interval", 60))
 
 async def main():
-    # Pfad zum Config-File prüfen
-    if not os.path.exists("/data/options.json"):
-        print("Fehler: /data/options.json nicht gefunden.")
-        return
-
+    log("Initialisiere...")
     with open("/data/options.json", "r") as f:
         config = json.load(f)
 
@@ -46,9 +50,6 @@ async def main():
 
     mqtt = MQTT(host=config.get("mqtt_host", "core-mosquitto"), port=1883, user=config.get("mqtt_user"), password=config.get("mqtt_password"))
     await mqtt.connect()
-    
-    # WICHTIG: Kurze Pause, um MQTT-Verbindung zu stabilisieren
-    await asyncio.sleep(2)
 
     discovery = Discovery(mqtt, device)
     await discovery.publish()
@@ -60,4 +61,7 @@ async def main():
     await poll_loop(api, state, device, config)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print(f"FATALER FEHLER: {e}")
