@@ -26,9 +26,15 @@ class Router:
                     print(f"Router: Temperatur erfolgreich auf {value} gesetzt.")
                 
                 elif key == "setACS":
-                    url = f"{self.api.base}/v2/calderas/{cid}/perfiles"
-                    await self.api.session.put(url, json={"acs": int(value)})
-                    print(f"Router: Warmwasser an API gesendet: {value}")
+                    # Nutzung des korrekten Endpunkts /estado und Keys st_acs_p04
+                    url = f"{self.api.base}/v2/calderas/{cid}/estado"
+                    payload = {"st_acs_p04": int(value)}
+                    
+                    async with self.api.session.put(url, json=payload) as response:
+                        if response.status == 200:
+                            print(f"Router: Warmwasser-Soll erfolgreich auf {value} gesetzt.")
+                        else:
+                            print(f"Router: Fehler bei ACS-Änderung: {response.status}")
 
             except Exception as e:
                 print(f"Router error beim Verarbeiten von {msg.topic}: {e}")
