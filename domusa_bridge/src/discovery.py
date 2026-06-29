@@ -15,7 +15,7 @@ class Discovery:
             "model": "HTEC Pro 12"
         }
 
-        # Definition aller Sensoren aus deinem YAML
+        # Definition aller Sensoren
         sensors = [
             {"name": "System Status", "uid": "status", "key": "alarma", "unit": None, "class": None, "icon": "mdi:heat-pump"},
             {"name": "Sub-Alarm", "uid": "sub_alarma", "key": "sub_alarma", "unit": None, "class": None, "icon": "mdi:alert-circle-outline"},
@@ -50,4 +50,25 @@ class Discovery:
                 json.dumps(payload), 
                 retain=True
             )
-            print(f"Discovery für {s['name']} gesendet.")
+            print(f"Discovery für Sensor {s['name']} gesendet.")
+
+        # Warmwasser-Regler (number-Entität) hinzufügen
+        acs_number_payload = {
+            "name": "Domusa Warmwasser Soll",
+            "unique_id": f"domusa_{cid}_acs_regler",
+            "device": device_info,
+            "state_topic": f"domusa/{cid}/status",
+            "value_template": "{{ value_json.st_activa_acs }}",
+            "command_topic": f"domusa/{cid}/set/setACS",
+            "min": 30,
+            "max": 70,
+            "unit_of_measurement": "°C",
+            "device_class": "temperature",
+            "icon": "mdi:water-heater-marker"
+        }
+        await self.mqtt.client.publish(
+            f"homeassistant/number/domusa_{cid}_acs_regler/config", 
+            json.dumps(acs_number_payload), 
+            retain=True
+        )
+        print("Discovery für Warmwasser-Regler gesendet.")
