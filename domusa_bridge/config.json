@@ -25,7 +25,7 @@
     "mqtt_port": "port",
     "mqtt_user": "str?",
     "mqtt_password": "password?",
-    "language": "list(de,en)",
+    "language": ["de", "en"],
     "poll_interval": "int"
   }
 }
