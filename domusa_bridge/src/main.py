@@ -44,6 +44,8 @@ async def main():
     
     # Sprachwahl aus Config laden (Standard: 'de')
     lang = config.get("language", "de")
+    if lang not in ["de", "en"]:
+    lang = "de" # Fallback, falls jemand etwas Falsches eintippt
     
     # Authentifizierung und API
     auth = Auth(config["username"], config["password"])
