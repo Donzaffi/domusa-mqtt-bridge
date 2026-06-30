@@ -15,6 +15,7 @@
     "mqtt_port": 1883,
     "mqtt_user": "",
     "mqtt_password": "",
+    "language": "de",
     "poll_interval": 60
   },
   "schema": {
@@ -24,6 +25,7 @@
     "mqtt_port": "port",
     "mqtt_user": "str?",
     "mqtt_password": "password?",
+    "language": "list(de,en)",
     "poll_interval": "int"
   }
 }
