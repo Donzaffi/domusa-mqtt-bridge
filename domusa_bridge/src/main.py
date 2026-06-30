@@ -3,6 +3,7 @@ import json
 import sys
 import os
 
+# Pfad zum src-Verzeichnis hinzufügen, damit die Module gefunden werden
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 from auth import Auth
@@ -12,6 +13,7 @@ from discovery import Discovery
 from state import StateManager
 from router import Router
 from storage import Storage
+from i18n import I18n
 
 def log(msg):
     print(f"DEBUG: {msg}")
@@ -35,33 +37,48 @@ async def poll_loop(api, state, device, cfg):
 
 async def main():
     log("Initialisiere...")
+    
+    # Konfiguration laden
     with open("/data/options.json", "r") as f:
         config = json.load(f)
-
+    
+    # Sprachwahl aus Config laden (Standard: 'de')
+    lang = config.get("language", "de")
+    
+    # Authentifizierung und API
     auth = Auth(config["username"], config["password"])
     token = await auth.get_token()
     api = DomusaAPI(token)
     
+    # Storage und Device
     storage = Storage()
     device = await storage.get_device()
     if not device:
         device = await api.get_caldera()
         await storage.save_device(device)
 
-    mqtt = MQTT(host=config.get("mqtt_host", "core-mosquitto"), port=1883, user=config.get("mqtt_user"), password=config.get("mqtt_password"))
+    # MQTT Verbindung
+    mqtt = MQTT(
+        host=config.get("mqtt_host", "core-mosquitto"), 
+        port=1883, 
+        user=config.get("mqtt_user"), 
+        password=config.get("mqtt_password")
+    )
     await mqtt.connect()
 
-    discovery = Discovery(mqtt, device)
+    # Discovery mit Sprach-Support initialisieren
+    discovery = Discovery(mqtt, device, lang=lang)
     await discovery.publish()
 
+    # State und Router starten
     state = StateManager(mqtt, device)
     router = Router(api, mqtt, device)
-    asyncio.create_task(router.listen())
-
-    await poll_loop(api, state, device, config)
+    
+    # Poll-Loop und Router gleichzeitig laufen lassen
+    await asyncio.gather(
+        poll_loop(api, state, device, config),
+        router.listen()
+    )
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        print(f"FATALER FEHLER: {e}")
+    asyncio.run(main())
