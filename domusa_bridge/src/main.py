@@ -64,10 +64,6 @@ async def main():
     )
     await mqtt.connect()
 
-    # Discovery mit Sprach-Support initialisieren
-    discovery = Discovery(mqtt, device, lang=lang)
-    await discovery.publish()
-
     # State und Router starten
     state = StateManager(mqtt, device)
     router = Router(api, mqtt, device)
