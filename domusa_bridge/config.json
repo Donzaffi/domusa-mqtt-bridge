@@ -8,6 +8,7 @@
   "boot": "auto",
   "init": false,
   "services": ["mqtt:want"],
+  "logo": "logo.png",
   "options": {
     "username": "",
     "password": "",
