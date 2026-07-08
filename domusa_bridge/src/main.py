@@ -45,8 +45,7 @@ async def main():
     
     # Authentifizierung und API
     auth = Auth(config["username"], config["password"])
-    token = await auth.get_token()
-    api = DomusaAPI(token)
+    api = DomusaAPI(auth) 
     
     # Storage und Device
     storage = Storage()
