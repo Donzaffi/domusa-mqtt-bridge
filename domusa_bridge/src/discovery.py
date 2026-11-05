@@ -1,6 +1,7 @@
 import json
 from i18n import I18n
 
+
 class Discovery:
     def __init__(self, mqtt, device, lang="de"):
         self.mqtt = mqtt
@@ -9,11 +10,12 @@ class Discovery:
 
     async def publish(self):
         cid = self.device["id"]
+        name = self.device.get("name") or f"Domusa {cid}"
         dev_info = {
-            "identifiers": [f"domusa_htec_{cid}"], 
-            "name": "Domusa HTEC", 
-            "manufacturer": "Domusa", 
-            "model": "HTEC Pro 12"
+            "identifiers": [f"domusa_htec_{cid}"],
+            "name": name,
+            "manufacturer": "Domusa",
+            "model": "HTEC Pro",
         }
 
         sensors = [
@@ -39,25 +41,29 @@ class Discovery:
             {"name": self.i18n.t("sensor_state"), "uid": "operation_state", "key": "estado_func_c52", "unit": None, "class": None, "icon": "mdi:state-machine"},
             {"name": self.i18n.t("sensor_mode"), "uid": "hp_mode", "key": "m_hp_p01", "unit": None, "class": None, "icon": "mdi:cog"},
             {"name": self.i18n.t("sensor_freq"), "uid": "grid_frequency", "key": "e_freq", "unit": "Hz", "class": "frequency", "icon": "mdi:sine-wave"},
-            {"name": self.i18n.t("sensor_zone1"), "uid": "zone1_heat_setpoint", "key": "st_zona1_c_p158", "unit": "°C", "class": "temperature", "icon": "mdi:radiator"}
+            {"name": self.i18n.t("sensor_zone1"), "uid": "zone1_heat_setpoint", "key": "st_zona1_c_p158", "unit": "°C", "class": "temperature", "icon": "mdi:radiator"},
         ]
 
         for s in sensors:
             payload = {
-                "name": f"Domusa {s['name']}",
+                "name": f"{name} {s['name']}",
                 "unique_id": f"domusa_{cid}_{s['uid']}",
                 "device": dev_info,
                 "state_topic": f"domusa/{cid}/status",
                 "value_template": f"{{{{ value_json.{s['key']} }}}}",
-                "unit_of_measurement": s['unit'],
-                "device_class": s['class'],
-                "state_class": "measurement" if s['unit'] else None,
-                "icon": s.get('icon')
+                "unit_of_measurement": s["unit"],
+                "device_class": s["class"],
+                "state_class": "measurement" if s["unit"] else None,
+                "icon": s.get("icon"),
             }
-            await self.mqtt.client.publish(f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config", json.dumps(payload), retain=True)
+            await self.mqtt.client.publish(
+                f"homeassistant/sensor/domusa_{cid}_{s['uid']}/config",
+                json.dumps({k: v for k, v in payload.items() if v is not None}),
+                retain=True,
+            )
 
         climate = {
-            "name": self.i18n.t("climate_acs"),
+            "name": f"{name} {self.i18n.t('climate_acs')}",
             "unique_id": f"domusa_{cid}_acs_thermostat",
             "device": dev_info,
             "temperature_command_topic": f"domusa/{cid}/set/setACS",
@@ -66,6 +72,10 @@ class Discovery:
             "temperature_state_topic": f"domusa/{cid}/status",
             "temperature_state_template": "{{ value_json.st_acs_p04 }}",
             "min_temp": 30, "max_temp": 70, "temp_step": 1,
-            "icon": "mdi:water-boiler-marker"
+            "icon": "mdi:water-boiler-marker",
         }
-        await self.mqtt.client.publish(f"homeassistant/climate/domusa_{cid}_acs_thermostat/config", json.dumps(climate), retain=True)
+        await self.mqtt.client.publish(
+            f"homeassistant/climate/domusa_{cid}_acs_thermostat/config",
+            json.dumps(climate),
+            retain=True,
+        )
