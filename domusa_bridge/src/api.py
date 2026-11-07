@@ -146,19 +146,28 @@ class DomusaAPI:
             await asyncio.sleep(1)
             config = await self.get_config(cid)
 
-            # Support either a flat config object or common nested wrappers.
-            candidates = [config]
-            if isinstance(config, dict):
-                for wrapper in ("updatedData", "data", "configuracion", "config"):
-                    nested = config.get(wrapper)
-                    if isinstance(nested, dict):
-                        candidates.append(nested)
+            # DEBUG: print the complete response returned by /configuracion.
+            # This lets us see exactly where the backend places P154.
+            print("API: Full GET verification response:")
+            print(config)
 
-            persisted = None
-            for candidate in candidates:
-                if isinstance(candidate, dict) and "ck_zona1_p154" in candidate:
-                    persisted = candidate["ck_zona1_p154"]
-                    break
+            def find_value(data, key):
+                """Recursively find a key anywhere in a dict/list response."""
+                if isinstance(data, dict):
+                    if key in data:
+                        return data[key]
+                    for value in data.values():
+                        found = find_value(value, key)
+                        if found is not None:
+                            return found
+                elif isinstance(data, list):
+                    for item in data:
+                        found = find_value(item, key)
+                        if found is not None:
+                            return found
+                return None
+
+            persisted = find_value(config, "ck_zona1_p154")
 
             print(
                 f"API: Verification attempt {attempt}/5: "
