@@ -102,24 +102,3 @@ class DomusaAPI:
     async def set_acs(self, cid, temperature):
         url = f"{self.base}/v2/calderas/{cid}/estado"
         return await self._request("PUT", url, {"st_acs_p04": int(temperature)})
-
-    async def set_config_value(self, cid, key, value):
-        """Update a writable Domusa configuration parameter."""
-        url = f"{self.base}/v2/calderas/{cid}/configuracion"
-        return await self._request("PUT", url, {key: value})
-
-    async def set_otc_curve(self, cid, curve):
-        # Zone 1 OTC curve (P154). Only these discrete values are supported by Domusa.
-        allowed_curves = {0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0}
-        curve = round(float(curve), 1)
-        if curve not in allowed_curves:
-            raise ValueError(
-                f"Unsupported OTC curve {curve}. Allowed values: "
-                "0 (Off), 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.5, 2, 2.5, 3, 4, 5, 6"
-            )
-        result = await self.set_config_value(cid, "ck_zona1_p154", curve)
-        if result is None:
-            return None
-        # Domusa may return HTTP 200 without echoing updatedData. Treat HTTP success
-        # as successful and let the next normal configuration poll refresh the state.
-        return result

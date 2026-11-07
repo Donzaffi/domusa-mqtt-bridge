@@ -36,7 +36,9 @@ class Discovery:
             "model": "Dual Clima HT / HTEC Pro",
         }
 
+        # Friendly, useful operating sensors. Raw Domusa field names stay hidden.
         sensors = [
+            # Water circuit
             ("flow_temperature", "Flow Temperature", "s_ida_hp_c08", "°C", "temperature", "mdi:thermometer-chevron-up", "measurement", None),
             ("return_temperature", "Return Temperature", "s_ret_hp_c07", "°C", "temperature", "mdi:thermometer-chevron-down", "measurement", None),
             ("delta_t", "Flow / Return Delta", "dt_hp_c11", "°C", "temperature", "mdi:delta", "measurement", None),
@@ -44,9 +46,13 @@ class Discovery:
             ("otc_requested_temperature", "OTC Requested Temperature", "st_activa_c_f", "°C", "temperature", "mdi:chart-bell-curve", "measurement", None),
             ("heating_setpoint", "Heating Setpoint", "st_c_p02", "°C", "temperature", "mdi:radiator", "measurement", None),
             ("cooling_setpoint", "Cooling Setpoint", "st_f_p03", "°C", "temperature", "mdi:snowflake", "measurement", None),
+
+            # Buffer / DHW
             ("buffer_temperature", "Buffer Temperature", "s_buffer_c57", "°C", "temperature", "mdi:thermometer-water", "measurement", [-255, -3276.8]),
             ("dhw_temperature", "DHW Temperature", "s_acs_c09", "°C", "temperature", "mdi:water-thermometer", "measurement", [-255, -3276.8]),
             ("dhw_setpoint", "DHW Setpoint", "st_activa_acs", "°C", "temperature", "mdi:water-boiler", "measurement", None),
+
+            # Outdoor / refrigeration circuit
             ("outdoor_temperature", "Outdoor Temperature", "s_ext_c02", "°C", "temperature", "mdi:thermometer", "measurement", [-255, -3276.8]),
             ("evaporator_temperature", "Evaporator Temperature", "s_evap_c00", "°C", "temperature", "mdi:thermometer-low", "measurement", [-255, -3276.8]),
             ("evaporating_temperature", "Calculated Evaporating Temperature", "s_evap_calc_c27", "°C", "temperature", "mdi:thermometer-low", "measurement", [-255, -3276.8]),
@@ -56,6 +62,8 @@ class Discovery:
             ("condensing_temperature", "Calculated Condensing Temperature", "s_cond_calc_c28", "°C", "temperature", "mdi:thermometer-high", "measurement", [-255, -3276.8]),
             ("ipm_temperature", "IPM Temperature", "s_ipm_c22", "°C", "temperature", "mdi:thermometer", "measurement", [-255, -3276.8]),
             ("t6_temperature", "T6 Temperature", "s_t6_c25", "°C", "temperature", "mdi:thermometer", "measurement", [-255, -3276.8]),
+
+            # Compressor / fans
             ("compressor_frequency", "Compressor Frequency", "freq_c15", "Hz", "frequency", "mdi:sine-wave", "measurement", None),
             ("compressor_frequency_setpoint", "Compressor Frequency Setpoint", "st_freq_c20", "Hz", "frequency", "mdi:sine-wave", "measurement", None),
             ("compressor_current", "Compressor Current", "curr_comp_c21", "A", "current", "mdi:current-ac", "measurement", None),
@@ -63,11 +71,17 @@ class Discovery:
             ("fan_1_speed", "Fan 1 Speed", "rpm_vent1_c16", "rpm", None, "mdi:fan", "measurement", None),
             ("fan_2_speed", "Fan 2 Speed", "rpm_vent2_c17", "rpm", None, "mdi:fan", "measurement", None),
             ("eev_position", "Electronic Expansion Valve Position", "eev_c18", "steps", None, "mdi:valve", "measurement", None),
+
+            # Electrical
             ("ac_voltage", "AC Voltage", "volt_ac_c23", "V", "voltage", "mdi:flash", "measurement", None),
             ("dc_bus_voltage", "DC Bus Voltage", "volt_dc_c24", "V", "voltage", "mdi:flash", "measurement", None),
             ("grid_frequency", "Grid Frequency", "e_freq", "Hz", "frequency", "mdi:sine-wave", "measurement", None),
+
+            # Pressures
             ("high_pressure", "High Refrigerant Pressure", "s_pralta_c13", "bar", "pressure", "mdi:gauge-high", "measurement", None),
             ("low_pressure", "Low Refrigerant Pressure", "s_prbaja_c14", "bar", "pressure", "mdi:gauge-low", "measurement", None),
+
+            # Other useful values
             ("water_flow", "Water Flow", "s_q_c10", "L/min", None, "mdi:water", "measurement", None),
             ("compressor_demand", "Compressor Demand", "pwm_c1_c51", "%", None, "mdi:engine", "measurement", None),
             ("p06_hysteresis", "P06 Heating/Cooling Hysteresis", "hyst_c_f_p06", "°C", "temperature", "mdi:delta", "measurement", None),
@@ -94,28 +108,12 @@ class Discovery:
             }
             await self._publish("sensor", f"domusa_{cid}_{uid}", payload)
 
-        # Writable Zone 1 OTC curve (P154).
-        # 0 is OFF. The remaining options match the Domusa app's discrete values.
-        otc_curve_options = [
-            "Off", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8",
-            "0.9", "1.0", "1.5", "2.0", "2.5", "3.0", "4.0", "5.0", "6.0",
-        ]
-        otc_curve_select = {
-            "name": "OTC Curve Control",
-            "object_id": f"domusa_{cid}_otc_curve_control",
-            "unique_id": f"domusa_{cid}_otc_curve_control",
-            "device": dev_info,
-            "state_topic": status_topic,
-            "value_template": (
-                "{% set v = value_json.ck_zona1_p154 | float(0) %}"
-                "{% if v == 0 %}Off{% else %}{{ '%.1f' | format(v) }}{% endif %}"
-            ),
-            "command_topic": f"domusa/{cid}/set/setOTCCurve",
-            "command_template": "{% if value == 'Off' %}0{% else %}{{ value }}{% endif %}",
-            "options": otc_curve_options,
-            "icon": "mdi:chart-bell-curve",
-        }
-        await self._publish("select", f"domusa_{cid}_otc_curve_control", otc_curve_select)
+        # Remove the previously published writable OTC Select entity from Home Assistant.
+        # Empty retained discovery payload tells Home Assistant to delete that entity.
+        otc_select_config_topic = (
+            f"homeassistant/select/domusa_{cid}_otc_curve_control/config"
+        )
+        await self.mqtt.client.publish(otc_select_config_topic, "", retain=True)
 
         binary_sensors = [
             ("power", "Heat Pump Power", "on_off_p00", "mdi:power", None),
@@ -149,6 +147,7 @@ class Discovery:
             }
             await self._publish("binary_sensor", f"domusa_{cid}_{uid}", payload)
 
+        # DHW climate entity
         climate = {
             "name": "DHW Thermostat",
             "object_id": f"domusa_{cid}_dhw_thermostat",
