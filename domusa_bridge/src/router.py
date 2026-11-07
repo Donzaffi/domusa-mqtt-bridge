@@ -2,9 +2,7 @@ class Router:
     def __init__(self, api, mqtt, devices):
         self.api = api
         self.mqtt = mqtt
-        self.devices = {
-            str(device["id"]): device for device in devices
-        }
+        self.devices = {str(device["id"]): device for device in devices}
 
     async def listen(self):
         for cid in self.devices:
@@ -17,63 +15,38 @@ class Router:
                 topic_str = str(msg.topic)
                 parts = topic_str.split("/")
 
-                # Expected: domusa/<device_id>/set/<command>
-                if (
-                    len(parts) < 4
-                    or parts[0] != "domusa"
-                    or parts[2] != "set"
-                ):
+                if len(parts) < 4 or parts[0] != "domusa" or parts[2] != "set":
                     continue
 
                 cid = parts[1]
                 key = parts[-1]
-
                 if cid not in self.devices:
                     continue
 
-                value = msg.payload.decode()
+                value = msg.payload.decode().strip()
                 print(f"Router: {cid} received {key}={value}")
 
                 if key == "setACS":
-                    result = await self.api.set_acs(
-                        cid, int(float(value))
-                    )
-
-                    if result is None:
-                        print(
-                            f"Router: ERROR - failed to change DHW "
-                            f"setpoint for {cid}"
-                        )
-                    else:
-                        print(
-                            f"Router: DHW setpoint for {cid} "
-                            f"changed to {value}"
-                        )
+                    await self.api.set_acs(cid, int(float(value)))
+                    print(f"Router: DHW setpoint for {cid} changed to {value}")
 
                 elif key == "setOTCCurve":
-                    curve_text = value.strip().replace("K=", "")
-                    curve = float(curve_text)
+                    if value.lower() == "off":
+                        curve = 0.0
+                    else:
+                        curve_text = value.replace("K=", "").strip()
+                        curve = float(curve_text)
 
                     success = await self.api.set_otc_curve(cid, curve)
 
                     if success:
-                        print(
-                            f"Router: OTC curve for {cid} "
-                            f"successfully changed to K={curve:g}"
-                        )
+                        label = "Off" if curve == 0 else f"{curve:.1f}"
+                        print(f"Router: OTC curve for {cid} successfully changed to {label}")
                     else:
-                        print(
-                            f"Router: ERROR - OTC curve for {cid} "
-                            "did not persist. The complete "
-                            "/configuracion response was printed above."
-                        )
+                        print(f"Router: ERROR - OTC curve for {cid} was not confirmed by the API")
 
                 else:
-                    print(
-                        f"Router: Unsupported command '{key}' for {cid}"
-                    )
+                    print(f"Router: Unsupported command '{key}' for {cid}")
 
             except Exception as e:
-                print(
-                    f"Router error processing {msg.topic}: {e}"
-                )
+                print(f"Router error processing {msg.topic}: {e}")
