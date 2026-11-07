@@ -80,8 +80,10 @@ class Discovery:
             ("high_pressure", "High Refrigerant Pressure", "s_pralta_c13", "bar", "pressure", "mdi:gauge-high", "measurement", None),
             ("low_pressure", "Low Refrigerant Pressure", "s_prbaja_c14", "bar", "pressure", "mdi:gauge-low", "measurement", None),
 
+            # Water flow
+            ("water_flow", "Water Flow", "s_q_c10", "L/min", None, "mdi:water", "measurement", None),
+
             # Other useful values
-            ("thermal_power", "Reported Thermal Power", "s_q_c10", "kW", "power", "mdi:flash-circle", "measurement", None),
             ("operation_state", "Operation State", "estado_func_c52", None, None, "mdi:state-machine", None, None),
             ("heat_demand", "Heat Demand", "demanda_hp", None, None, "mdi:fire", None, None),
             ("hp_mode", "Heat Pump Mode", "m_hp_p01", None, None, "mdi:hvac", None, None),
