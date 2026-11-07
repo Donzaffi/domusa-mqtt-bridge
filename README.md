@@ -1,7 +1,7 @@
 # Domusa MQTT Bridge
 
-[![GitHub Issues](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)] (https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Issues] (https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)] (https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)
+[![License: MIT] (https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This Home Assistant Add-on acts as a bridge between your **Domusa heating system** and your local **MQTT broker**. 
 It retrieves data from the Domusa cloud API and makes it available within Home Assistant for visualisation and automation.
