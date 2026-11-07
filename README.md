@@ -63,7 +63,9 @@ Give it a _Title_ (ex: Domusa HP) and activate _Add to sidebar._
 
 Go to the newly created Dashboard, click on the pencil icon to edit, then click on the 3 dots and select R_aw configuration editor_.
 
-Paste the code from [here](/dashboard/dashboard.yaml) and use the search and replace function in order to change xxxxxx to your **numeric installation ID**.
+Paste the code from [here](/dashboard_exemple.yaml) and use the search and replace function in order to change **xxxxxx** to your **numeric installation ID**.
+
+You can find the numeric installation ID on the iConnect app or on the Working Status on your LCD.
 
 See [Picture 1](/images/dashboard1.jpg) and [Picture 2](/images/dashboard2.jpg).
 
