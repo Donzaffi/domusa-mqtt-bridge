@@ -1,13 +1,14 @@
 # Domusa MQTT Bridge
 
-[![GitHub Issues](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)
+[![GitHub Issues](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)] (https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This Home Assistant Add-on acts as a bridge between your **Domusa heating system** and your local **MQTT broker**. 
 It retrieves data from the Domusa cloud API and makes it available within Home Assistant for visualisation and automation.
 
 This is a fork of [**Donzaffi/domusa-mqtt-bridge**](https://github.com/Donzaffi/domusa-mqtt-bridge).
-I modified it to support multiple heat pumps in the iConnect account and enable automatic sensor creation in Home Assistant. 
+
+I modified it to support multiple heat pumps in the iConnect account and automatically create sensors in Home Assistant. 
 
 ## How it works
 
@@ -15,6 +16,7 @@ This add-on bridges the gap between the manufacturer's cloud service and your lo
 
 * **Cloud API Integration:** The add-on communicates with the official Domusa cloud API (hosted on Azure) to fetch system status and send commands.
 * **Local MQTT:** Once the data is retrieved, it is published to your local MQTT broker. This allows you to integrate your heating data seamlessly into Home Assistant dashboards and automations.
+
 * **Requirements:**
   - A stable internet connection is required for the bridge to communicate with the Domusa cloud services and **Domusa iConnect Module**.
   - An MQTT broker is installed (independent or as an add-on in Home Assistant).
