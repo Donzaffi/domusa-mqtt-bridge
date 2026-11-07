@@ -39,30 +39,23 @@ This project is an independent, community-driven integration and is **not offici
 After installation, go to the **Configuration** tab of the add-on to provide your credentials and MQTT settings:
 
 ```yaml
-mqtt_broker: "core-mosquitto"
-mqtt_port: 1883
-mqtt_user: "your_mqtt_username"
-mqtt_password: "your_mqtt_password"
-domusa_user: "your_domusa_app_email"
-domusa_password: "your_domusa_app_password"
+username: xxx@xxx.com # your iConnect email address account
+password: yyyyyy # # your iConnect account password
+mqtt_host: xxx.xxx.xx.xx # IP of the MQTT server
+mqtt_port: 1883 # port of the MQTT server
+mqtt_user: xxx # MQTTT username
+mqtt_password: xxx # MQTT pass
+language: en
+poll_interval: 60
 ```
 
 *Note: Your credentials are used locally by the add-on to authenticate with the Domusa API and are not shared with any third party.*
 
-## Sensor Naming
-
-The sensors provided by this add-on are currently named in German. If you prefer a different language, you can easily rename the entities directly within Home Assistant:
-
-1. Go to **Settings** -> **Devices & Services** -> **Entities**.
-2. Find the sensor you want to rename.
-3. Click on the sensor name and change it to your preferred language.
-
-Home Assistant will remember these custom names even after updates.
-
 ## Support
 
-If you encounter any issues or have feature requests, please [open an issue on GitHub](https://github.com/Donzaffi/domusa-mqtt-bridge/issues). Contributions are welcome!
+If you encounter any issues or have feature requests, please [open an issue on GitHub](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues). 
+Contributions are welcome!
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
