@@ -1,5 +1,5 @@
 {
-  "name": "Domusa MQTT Bridge",
+  "name": "Domusa MQTT Bridge Multiple",
   "version": "1.2",
   "slug": "domusa_bridge",
   "description": "Stable MQTT bridge for Domusa API, multiple devices",
