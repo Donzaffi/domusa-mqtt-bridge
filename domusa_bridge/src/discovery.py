@@ -42,9 +42,8 @@ class Discovery:
             ("flow_temperature", "Flow Temperature", "s_ida_hp_c08", "°C", "temperature", "mdi:thermometer-chevron-up", "measurement", None),
             ("return_temperature", "Return Temperature", "s_ret_hp_c07", "°C", "temperature", "mdi:thermometer-chevron-down", "measurement", None),
             ("delta_t", "Flow / Return Delta", "dt_hp_c11", "°C", "temperature", "mdi:delta", "measurement", None),
-            ("otc_requested_temperature", "OTC Requested Temperature", "st_activa_c_f", "°C", "temperature", "mdi:thermostat", "measurement", None),
-            ("p06_hysteresis", "P06 Hysteresis", "hyst_c_f_p06", "°C", "temperature", "mdi:delta", "measurement", None),
-            ("otc_curve_value", "OTC Curve Value", "st_scop_graf_p107", None, None, "mdi:chart-bell-curve", "measurement", None),
+            ("active_heating_setpoint", "Active Heating Setpoint", "st_activa_c_f", "°C", "temperature", "mdi:radiator", "measurement", None),
+            ("otc_requested_temperature", "OTC Requested Temperature", "st_activa_c_f", "°C", "temperature", "mdi:chart-bell-curve", "measurement", None),
             ("heating_setpoint", "Heating Setpoint", "st_c_p02", "°C", "temperature", "mdi:radiator", "measurement", None),
             ("cooling_setpoint", "Cooling Setpoint", "st_f_p03", "°C", "temperature", "mdi:snowflake", "measurement", None),
 
@@ -54,7 +53,7 @@ class Discovery:
             ("dhw_setpoint", "DHW Setpoint", "st_activa_acs", "°C", "temperature", "mdi:water-boiler", "measurement", None),
 
             # Outdoor / refrigeration circuit
-            ("exterior_temperature", "Exterior Temperature", "s_ext_c02", "°C", "temperature", "mdi:thermometer", "measurement", [-255, -3276.8]),
+            ("outdoor_temperature", "Outdoor Temperature", "s_ext_c02", "°C", "temperature", "mdi:thermometer", "measurement", [-255, -3276.8]),
             ("evaporator_temperature", "Evaporator Temperature", "s_evap_c00", "°C", "temperature", "mdi:thermometer-low", "measurement", [-255, -3276.8]),
             ("evaporating_temperature", "Calculated Evaporating Temperature", "s_evap_calc_c27", "°C", "temperature", "mdi:thermometer-low", "measurement", [-255, -3276.8]),
             ("suction_temperature", "Suction Temperature", "s_suction_c03", "°C", "temperature", "mdi:thermometer", "measurement", [-255, -3276.8]),
@@ -66,7 +65,6 @@ class Discovery:
 
             # Compressor / fans
             ("compressor_frequency", "Compressor Frequency", "freq_c15", "Hz", "frequency", "mdi:sine-wave", "measurement", None),
-            ("compressor_demand", "Compressor Demand", "pwm_c1_c51", "%", None, "mdi:percent", "measurement", None),
             ("compressor_frequency_setpoint", "Compressor Frequency Setpoint", "st_freq_c20", "Hz", "frequency", "mdi:sine-wave", "measurement", None),
             ("compressor_current", "Compressor Current", "curr_comp_c21", "A", "current", "mdi:current-ac", "measurement", None),
             ("compressor_phase_current", "Compressor Phase Current", "curr_ph_comp", "A", "current", "mdi:current-ac", "measurement", None),
@@ -83,10 +81,11 @@ class Discovery:
             ("high_pressure", "High Refrigerant Pressure", "s_pralta_c13", "bar", "pressure", "mdi:gauge-high", "measurement", None),
             ("low_pressure", "Low Refrigerant Pressure", "s_prbaja_c14", "bar", "pressure", "mdi:gauge-low", "measurement", None),
 
-            # Water flow
-            ("water_flow", "Water Flow", "s_q_c10", "L/min", None, "mdi:water", "measurement", None),
-
             # Other useful values
+            ("water_flow", "Water Flow", "s_q_c10", "L/min", None, "mdi:water", "measurement", None),
+            ("compressor_demand", "Compressor Demand", "pwm_c1_c51", "%", None, "mdi:engine", "measurement", None),
+            ("p06_hysteresis", "P06 Heating/Cooling Hysteresis", "hyst_c_f_p06", "°C", "temperature", "mdi:delta", "measurement", None),
+            ("otc_curve_value", "OTC Curve Value", "st_scop_graf_p107", None, None, "mdi:chart-bell-curve", None, None),
             ("operation_state", "Operation State", "estado_func_c52", None, None, "mdi:state-machine", None, None),
             ("heat_demand", "Heat Demand", "demanda_hp", None, None, "mdi:fire", None, None),
             ("hp_mode", "Heat Pump Mode", "m_hp_p01", None, None, "mdi:hvac", None, None),
@@ -111,6 +110,7 @@ class Discovery:
 
         binary_sensors = [
             ("power", "Heat Pump Power", "on_off_p00", "mdi:power", None),
+            ("otc_enabled", "OTC Enabled", "m_otc_p19", "mdi:chart-bell-curve", None),
             ("zone_1_demand", "Zone 1 Demand", "demanda_zona1", "mdi:home-thermometer", None),
             ("zone_2_demand", "Zone 2 Demand", "demanda_zona2", "mdi:home-thermometer", None),
             ("zone_3_demand", "Zone 3 Demand", "demanda_zona3", "mdi:home-thermometer", None),
