@@ -1,0 +1,195 @@
+#replace using search and replace xxxxxx with your installation number, from iConnect app or the LCD Working status
+
+title: Domusa MQTT Bridge
+views:
+  - title: Overview
+    path: domusa-mqtt
+    icon: mdi:heat-pump
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Operation Status
+            icon: mdi:heat-pump
+          - type: entities
+            title: Heat Pump Status
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.xxxxxx_heat_pump_power
+                name: Heat Pump Power
+              - entity: binary_sensor.xxxxxx_compressor_enabled
+                name: Compressor
+              - entity: binary_sensor.xxxxxx_zone_1_demand
+                name: Zone 1 Demand
+              - entity: binary_sensor.xxxxxx_sg_ready_active
+                name: SG Ready
+          - type: gauge
+            entity: sensor.xxxxxx_compressor_frequency
+            name: Compressor Frequency
+            min: 0
+            max: 85
+            needle: true
+            severity:
+              green: 0
+              yellow: 60
+              red: 75
+          - type: entities
+            title: Compressor
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_compressor_frequency
+                name: Frequency
+              - entity: sensor.xxxxxx_compressor_current
+                name: Compressor Current
+              - entity: sensor.xxxxxx_compressor_phase_current
+                name: Phase Current
+      - type: grid
+        cards:
+          - type: heading
+            heading: Heating & Hydraulic Circuit
+            icon: mdi:radiator
+          - type: entities
+            title: Water Circuit
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_flow_temperature
+                name: Actual Flow Temperature
+              - entity: sensor.xxxxxx_return_temperature
+                name: Actual Return Temperature
+              - entity: sensor.xxxxxx_water_flow
+                name: Water Flow
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor Temperature
+          - type: entities
+            title: Heating Curve / OTC
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.xxxxxx_otc_enabled
+                name: OTC Enabled
+              - entity: sensor.xxxxxx_otc_curve
+                name: OTC Curve
+              - entity: sensor.xxxxxx_otc_requested_temperature
+                name: Requested Temperature
+              - entity: sensor.xxxxxx_p06_heating_cooling_hysteresis
+                name: Heating/Cooling Hysteresis
+          - type: history-graph
+            title: Flow & Return — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.xxxxxx_flow_temperature
+                name: Flow
+              - entity: sensor.xxxxxx_return_temperature
+                name: Return
+              - entity: sensor.xxxxxx_otc_requested_temperature
+                name: Requested
+      - type: grid
+        cards:
+          - type: heading
+            heading: Domestic Hot Water
+            icon: mdi:water-boiler
+          - type: entities
+            title: DHW
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_dhw_temperature
+                name: DHW Temperature
+          - type: history-graph
+            title: DHW Temperature — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.xxxxxx_dhw_temperature
+                name: DHW Temperature
+      - type: grid
+        cards:
+          - type: heading
+            heading: Electrical & Fans
+            icon: mdi:lightning-bolt
+          - type: entities
+            title: Electrical Measurements
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_ac_voltage
+                name: AC Voltage
+              - entity: sensor.xxxxxx_compressor_current
+                name: Compressor Current
+              - entity: sensor.xxxxxx_compressor_phase_current
+                name: Compressor Phase Current
+          - type: entities
+            title: Fans
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_fan_1_speed
+                name: Fan 1 Speed
+              - entity: sensor.xxxxxx_fan_2_speed
+                name: Fan 2 Speed
+      - type: grid
+        cards:
+          - type: heading
+            heading: Domusa Temperature Sensors
+            icon: mdi:thermometer-lines
+          - type: entities
+            title: Main Temperatures
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor
+              - entity: sensor.xxxxxx_flow_temperature
+                name: Actual Flow
+              - entity: sensor.xxxxxx_return_temperature
+                name: Actual Return
+              - entity: sensor.xxxxxx_dhw_temperature
+                name: DHW
+              - entity: sensor.xxxxxx_evaporator_temperature
+                name: Evaporating
+              - entity: sensor.xxxxxx_condenser_temperature
+                name: Condensing
+              - entity: sensor.xxxxxx_suction_temperature
+                name: Suction
+              - entity: sensor.xxxxxx_discharge_temperature
+                name: Discharge
+  - title: Diagnostics
+    path: domusa-diagnostics
+    icon: mdi:stethoscope
+    cards:
+      - type: entities
+        title: Compressor Diagnostics
+        show_header_toggle: false
+        entities:
+          - entity: binary_sensor.xxxxxx_compressor_enabled
+            name: Compressor Enabled
+          - entity: sensor.xxxxxx_compressor_frequency
+            name: Frequency
+          - entity: sensor.xxxxxx_compressor_current
+            name: Current
+          - entity: sensor.xxxxxx_compressor_phase_current
+            name: Phase Current
+      - type: entities
+        title: Refrigerant Measurements
+        show_header_toggle: false
+        entities:
+          - entity: sensor.xxxxxx_high_refrigerant_pressure
+            name: High Refrigerant Pressure
+          - entity: sensor.xxxxxx_evaporator_temperature
+            name: Evaporating Temperature
+          - entity: sensor.xxxxxx_condenser_temperature
+            name: Condensing Temperature
+          - entity: sensor.xxxxxx_suction_temperature
+            name: Suction Temperature
+          - entity: sensor.xxxxxx_discharge_temperature
+            name: Discharge Temperature
+      - type: entities
+        title: System Inputs
+        show_header_toggle: false
+        entities:
+          - entity: binary_sensor.xxxxxx_zone_1_demand
+            name: Zone 1 Demand
+          - entity: binary_sensor.xxxxxx_otc_enabled
+            name: OTC Enabled
+          - entity: binary_sensor.xxxxxx_sg_ready_active
+            name: SG Ready
+          - entity: sensor.xxxxxx_outdoor_temperature
+            name: Outdoor Temperature
