@@ -1,3 +1,4 @@
+import asyncio
 import aiohttp
 
 
@@ -116,18 +117,61 @@ class DomusaAPI:
         print(f"API: Writing ck_zona1_p154={curve} for {cid}")
         result = await self.set_config_value(cid, "ck_zona1_p154", curve)
 
-        if not isinstance(result, dict):
-            print("API: OTC curve write returned no JSON result")
+        # A successful PUT does not always echo updatedData.ck_zona1_p154.
+        # Therefore, accept a valid API response and verify by reading the
+        # configuration back from the server.
+        if result is None:
+            print("API: OTC curve write request failed")
             return False
 
-        updated = result.get("updatedData")
-        if isinstance(updated, dict) and "ck_zona1_p154" in updated:
-            persisted = updated["ck_zona1_p154"]
-            print(f"API: Verification from updatedData: ck_zona1_p154={persisted}")
-            try:
-                return round(float(persisted), 1) == curve
-            except (TypeError, ValueError):
-                return False
+        if isinstance(result, dict):
+            updated = result.get("updatedData")
+            if isinstance(updated, dict) and "ck_zona1_p154" in updated:
+                persisted = updated["ck_zona1_p154"]
+                print(f"API: Verification from updatedData: ck_zona1_p154={persisted}")
+                try:
+                    if round(float(persisted), 1) == curve:
+                        return True
+                except (TypeError, ValueError):
+                    pass
+            else:
+                print("API: PUT successful; value not echoed in response, verifying with GET")
+        else:
+            # _request() can return True for a successful response without JSON.
+            print("API: PUT successful; no JSON body, verifying with GET")
 
-        print("API: Write response did not contain updatedData.ck_zona1_p154")
+        # The cloud backend can apply configuration asynchronously. Retry a
+        # few times before declaring the write unsuccessful.
+        for attempt in range(1, 6):
+            await asyncio.sleep(1)
+            config = await self.get_config(cid)
+
+            # Support either a flat config object or common nested wrappers.
+            candidates = [config]
+            if isinstance(config, dict):
+                for wrapper in ("updatedData", "data", "configuracion", "config"):
+                    nested = config.get(wrapper)
+                    if isinstance(nested, dict):
+                        candidates.append(nested)
+
+            persisted = None
+            for candidate in candidates:
+                if isinstance(candidate, dict) and "ck_zona1_p154" in candidate:
+                    persisted = candidate["ck_zona1_p154"]
+                    break
+
+            print(
+                f"API: Verification attempt {attempt}/5: "
+                f"ck_zona1_p154={persisted}"
+            )
+
+            try:
+                if persisted is not None and round(float(persisted), 1) == curve:
+                    print("API: OTC curve write confirmed by GET")
+                    return True
+            except (TypeError, ValueError):
+                pass
+
+        print("API: OTC curve write was not confirmed after GET verification")
         return False
+
