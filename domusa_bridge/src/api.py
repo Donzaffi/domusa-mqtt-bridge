@@ -17,29 +17,43 @@ class DomusaAPI:
 
     async def _request(self, method, url, json_data=None):
         headers = await self._get_headers()
+
+        async def do_request(session):
+            async with session.request(method, url, json=json_data, timeout=10) as response:
+                if 200 <= response.status < 300:
+                    try:
+                        data = await response.json()
+                    except Exception:
+                        data = True
+                    print(f"API OK {method} {url}: HTTP {response.status}")
+                    return data
+
+                body = await response.text()
+                print(f"API error {method} {url}: HTTP {response.status} - {body}")
+                return None
+
         try:
             async with aiohttp.ClientSession(headers=headers) as session:
                 async with session.request(method, url, json=json_data, timeout=10) as response:
                     if response.status == 401:
+                        await response.read()
                         self.token = await self.auth.get_token()
                         headers["Authorization"] = f"Bearer {self.token}"
-                        async with session.request(method, url, json=json_data, timeout=10) as retry:
-                            if retry.status == 200:
-                                try:
-                                    return await retry.json()
-                                except Exception:
-                                    return True
-                            print(f"API error {method} {url}: HTTP {retry.status}")
-                            return None
+                        async with aiohttp.ClientSession(headers=headers) as retry_session:
+                            return await do_request(retry_session)
 
-                    if response.status == 200:
+                    if 200 <= response.status < 300:
                         try:
-                            return await response.json()
+                            data = await response.json()
                         except Exception:
-                            return True
+                            data = True
+                        print(f"API OK {method} {url}: HTTP {response.status}")
+                        return data
 
-                    print(f"API error {method} {url}: HTTP {response.status}")
+                    body = await response.text()
+                    print(f"API error {method} {url}: HTTP {response.status} - {body}")
                     return None
+
         except Exception as e:
             print(f"API Error at {url}: {e}")
             return None
@@ -49,7 +63,6 @@ class DomusaAPI:
         return result if isinstance(result, (dict, list)) else {}
 
     async def get_calderas(self):
-        """Return every Domusa installation/heat pump available to the account."""
         url = f"{self.base}/v1/usuario/calderas/aliases"
         data = await self._get(url)
 
@@ -58,16 +71,10 @@ class DomusaAPI:
             for alias, value in data.items():
                 if isinstance(value, dict):
                     cid = value.get("idcaldera", alias)
-                    name = (
-                        value.get("alias")
-                        or value.get("nombre")
-                        or value.get("name")
-                        or str(alias)
-                    )
+                    name = value.get("alias") or value.get("nombre") or value.get("name") or str(alias)
                 else:
                     cid = alias
                     name = str(alias)
-
                 devices.append({"id": str(cid), "name": str(name), "alias": str(alias)})
         elif isinstance(data, list):
             for index, value in enumerate(data):
@@ -79,7 +86,6 @@ class DomusaAPI:
                 name = value.get("alias") or value.get("nombre") or value.get("name") or f"Domusa {index + 1}"
                 devices.append({"id": str(cid), "name": str(name), "alias": str(name)})
 
-        # Remove accidental duplicates while preserving API order.
         unique = []
         seen = set()
         for device in devices:
@@ -89,7 +95,6 @@ class DomusaAPI:
         return unique
 
     async def get_caldera(self):
-        """Backward-compatible helper: returns the first device."""
         devices = await self.get_calderas()
         return devices[0] if devices else None
 
@@ -104,17 +109,34 @@ class DomusaAPI:
         return await self._request("PUT", url, {"st_acs_p04": int(temperature)})
 
     async def set_config_value(self, cid, key, value):
-        """Update a writable Domusa configuration parameter."""
         url = f"{self.base}/v2/calderas/{cid}/configuracion"
         return await self._request("PUT", url, {key: value})
 
     async def set_otc_curve(self, cid, curve):
-        # Zone 1 OTC curve (P154). Only these discrete values are supported by Domusa.
         allowed_curves = {6.0, 5.0, 4.0, 3.0, 2.5, 2.0, 1.5, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2}
         curve = round(float(curve), 1)
+
         if curve not in allowed_curves:
-            raise ValueError(
-                f"Unsupported OTC curve {curve}. Allowed values: "
-                "6, 5, 4, 3, 2.5, 2, 1.5, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2"
-            )
-        return await self.set_config_value(cid, "ck_zona1_p154", curve)
+            raise ValueError(f"Unsupported OTC curve {curve}")
+
+        key = "ck_zona1_p154"
+        print(f"API: Writing {key}={curve} for {cid}")
+
+        # First try the minimal write payload.
+        result = await self.set_config_value(cid, key, curve)
+        if result is None:
+            return False
+
+        # Verify what the Domusa API actually stored.
+        config = await self.get_config(cid)
+        stored = config.get(key) if isinstance(config, dict) else None
+        print(f"API: Verification after write: {key}={stored}")
+
+        try:
+            if stored is not None and abs(float(stored) - curve) < 0.001:
+                return True
+        except (TypeError, ValueError):
+            pass
+
+        print(f"API: Write returned success but {key} did not persist")
+        return False
