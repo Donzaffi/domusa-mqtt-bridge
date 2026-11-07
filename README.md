@@ -53,6 +53,21 @@ poll_interval: 60
 
 *Note: Your credentials are used locally by the add-on to authenticate with the Domusa API and are not shared with any third party.*
 
+## Home Assistant dashboard example
+
+You can customise your dashboard as you want, but here is an example.
+
+Go to _Settings - Dashboards - Add Dashboard (New dashboard from scratch)._
+
+Give it a _Title_ (ex: Domusa HP) and activate _Add to sidebar._
+
+Go to the newly created Dashboard, click on the pencil icon to edit, then click on the 3 dots and select R_aw configuration editor_.
+
+Paste the code from [here](/dashboard/dashboard.yaml) and use the search and replace function in order to change xxxxxx to your **numeric installation ID**.
+
+See [Picture 1](/images/dashboard1.jpg) and [Picture 2](/images/dashboard2.jpg).
+
+
 ## Support
 
 If you encounter any issues or have feature requests, please [open an issue on GitHub](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues). 
