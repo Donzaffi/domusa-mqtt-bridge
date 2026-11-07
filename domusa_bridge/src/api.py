@@ -1,4 +1,3 @@
-import asyncio
 import aiohttp
 
 
@@ -50,6 +49,7 @@ class DomusaAPI:
         return result if isinstance(result, (dict, list)) else {}
 
     async def get_calderas(self):
+        """Return every Domusa installation/heat pump available to the account."""
         url = f"{self.base}/v1/usuario/calderas/aliases"
         data = await self._get(url)
 
@@ -58,10 +58,16 @@ class DomusaAPI:
             for alias, value in data.items():
                 if isinstance(value, dict):
                     cid = value.get("idcaldera", alias)
-                    name = value.get("alias") or value.get("nombre") or value.get("name") or str(alias)
+                    name = (
+                        value.get("alias")
+                        or value.get("nombre")
+                        or value.get("name")
+                        or str(alias)
+                    )
                 else:
                     cid = alias
                     name = str(alias)
+
                 devices.append({"id": str(cid), "name": str(name), "alias": str(alias)})
         elif isinstance(data, list):
             for index, value in enumerate(data):
@@ -73,6 +79,7 @@ class DomusaAPI:
                 name = value.get("alias") or value.get("nombre") or value.get("name") or f"Domusa {index + 1}"
                 devices.append({"id": str(cid), "name": str(name), "alias": str(name)})
 
+        # Remove accidental duplicates while preserving API order.
         unique = []
         seen = set()
         for device in devices:
@@ -82,6 +89,7 @@ class DomusaAPI:
         return unique
 
     async def get_caldera(self):
+        """Backward-compatible helper: returns the first device."""
         devices = await self.get_calderas()
         return devices[0] if devices else None
 
@@ -96,91 +104,22 @@ class DomusaAPI:
         return await self._request("PUT", url, {"st_acs_p04": int(temperature)})
 
     async def set_config_value(self, cid, key, value):
+        """Update a writable Domusa configuration parameter."""
         url = f"{self.base}/v2/calderas/{cid}/configuracion"
         return await self._request("PUT", url, {key: value})
 
     async def set_otc_curve(self, cid, curve):
-        # Zone 1 OTC curve (P154). 0 means OFF.
-        allowed_curves = {
-            0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
-            1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0,
-        }
-
+        # Zone 1 OTC curve (P154). Only these discrete values are supported by Domusa.
+        allowed_curves = {0.0, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0}
         curve = round(float(curve), 1)
         if curve not in allowed_curves:
             raise ValueError(
                 f"Unsupported OTC curve {curve}. Allowed values: "
-                "0 (Off), 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, "
-                "1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0"
+                "0 (Off), 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.5, 2, 2.5, 3, 4, 5, 6"
             )
-
-        print(f"API: Writing ck_zona1_p154={curve} for {cid}")
         result = await self.set_config_value(cid, "ck_zona1_p154", curve)
-
-        # A successful PUT does not always echo updatedData.ck_zona1_p154.
-        # Therefore, accept a valid API response and verify by reading the
-        # configuration back from the server.
         if result is None:
-            print("API: OTC curve write request failed")
-            return False
-
-        if isinstance(result, dict):
-            updated = result.get("updatedData")
-            if isinstance(updated, dict) and "ck_zona1_p154" in updated:
-                persisted = updated["ck_zona1_p154"]
-                print(f"API: Verification from updatedData: ck_zona1_p154={persisted}")
-                try:
-                    if round(float(persisted), 1) == curve:
-                        return True
-                except (TypeError, ValueError):
-                    pass
-            else:
-                print("API: PUT successful; value not echoed in response, verifying with GET")
-        else:
-            # _request() can return True for a successful response without JSON.
-            print("API: PUT successful; no JSON body, verifying with GET")
-
-        # The cloud backend can apply configuration asynchronously. Retry a
-        # few times before declaring the write unsuccessful.
-        for attempt in range(1, 6):
-            await asyncio.sleep(1)
-            config = await self.get_config(cid)
-
-            # DEBUG: print the complete response returned by /configuracion.
-            # This lets us see exactly where the backend places P154.
-            print("API: Full GET verification response:")
-            print(config)
-
-            def find_value(data, key):
-                """Recursively find a key anywhere in a dict/list response."""
-                if isinstance(data, dict):
-                    if key in data:
-                        return data[key]
-                    for value in data.values():
-                        found = find_value(value, key)
-                        if found is not None:
-                            return found
-                elif isinstance(data, list):
-                    for item in data:
-                        found = find_value(item, key)
-                        if found is not None:
-                            return found
-                return None
-
-            persisted = find_value(config, "ck_zona1_p154")
-
-            print(
-                f"API: Verification attempt {attempt}/5: "
-                f"ck_zona1_p154={persisted}"
-            )
-
-            try:
-                if persisted is not None and round(float(persisted), 1) == curve:
-                    print("API: OTC curve write confirmed by GET")
-                    return True
-            except (TypeError, ValueError):
-                pass
-
-        print("API: OTC curve write was not confirmed after GET verification")
-        return False
-
+            return None
+        # Domusa may return HTTP 200 without echoing updatedData. Treat HTTP success
+        # as successful and let the next normal configuration poll refresh the state.
+        return result

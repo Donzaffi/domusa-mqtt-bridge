@@ -14,7 +14,7 @@ class Router:
             try:
                 topic_str = str(msg.topic)
                 parts = topic_str.split("/")
-
+                # Expected: domusa/<device_id>/set/<command>
                 if len(parts) < 4 or parts[0] != "domusa" or parts[2] != "set":
                     continue
 
@@ -23,28 +23,22 @@ class Router:
                 if cid not in self.devices:
                     continue
 
-                value = msg.payload.decode().strip()
+                value = msg.payload.decode()
                 print(f"Router: {cid} received {key}={value}")
 
                 if key == "setACS":
                     await self.api.set_acs(cid, int(float(value)))
                     print(f"Router: DHW setpoint for {cid} changed to {value}")
-
                 elif key == "setOTCCurve":
-                    if value.lower() == "off":
-                        curve = 0.0
+                    curve_text = value.strip().replace("K=", "")
+                    curve = float(curve_text)
+                    result = await self.api.set_otc_curve(cid, curve)
+                    if result is None:
+                        print(f"Router: ERROR - OTC curve write failed for {cid}")
+                    elif curve == 0:
+                        print(f"Router: OTC curve for {cid} set to OFF")
                     else:
-                        curve_text = value.replace("K=", "").strip()
-                        curve = float(curve_text)
-
-                    success = await self.api.set_otc_curve(cid, curve)
-
-                    if success:
-                        label = "Off" if curve == 0 else f"{curve:.1f}"
-                        print(f"Router: OTC curve for {cid} successfully changed to {label}")
-                    else:
-                        print(f"Router: ERROR - OTC curve for {cid} was not confirmed by the API")
-
+                        print(f"Router: OTC curve for {cid} changed to K={curve}")
                 else:
                     print(f"Router: Unsupported command '{key}' for {cid}")
 
