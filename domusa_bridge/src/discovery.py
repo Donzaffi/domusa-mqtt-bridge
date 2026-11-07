@@ -85,7 +85,7 @@ class Discovery:
             ("water_flow", "Water Flow", "s_q_c10", "L/min", None, "mdi:water", "measurement", None),
             ("compressor_demand", "Compressor Demand", "pwm_c1_c51", "%", None, "mdi:engine", "measurement", None),
             ("p06_hysteresis", "P06 Heating/Cooling Hysteresis", "hyst_c_f_p06", "°C", "temperature", "mdi:delta", "measurement", None),
-            ("otc_curve_value", "OTC Curve Value", "st_scop_graf_p107", None, None, "mdi:chart-bell-curve", None, None),
+            ("otc_curve", "OTC Curve", "ck_zona1_p154", None, None, "mdi:chart-bell-curve", "measurement", None),
             ("operation_state", "Operation State", "estado_func_c52", None, None, "mdi:state-machine", None, None),
             ("heat_demand", "Heat Demand", "demanda_hp", None, None, "mdi:fire", None, None),
             ("hp_mode", "Heat Pump Mode", "m_hp_p01", None, None, "mdi:hvac", None, None),
