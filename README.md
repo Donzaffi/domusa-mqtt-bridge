@@ -1,13 +1,13 @@
 # Domusa MQTT Bridge
 
-[![GitHub Issues](https://img.shields.io/github/issues/Donzaffi/domusa-mqtt-bridge)](https://github.com/Donzaffi/domusa-mqtt-bridge/issues)
+[![GitHub Issues](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This Home Assistant Add-on acts as a bridge between your **Domusa heating system** and your local **MQTT broker**. 
 It retrieves data from the Domusa cloud API and makes it available within Home Assistant for visualisation and automation.
 
 This is a fork of [**Donzaffi/domusa-mqtt-bridge**](https://github.com/Donzaffi/domusa-mqtt-bridge).
-I modified it to work with multiple heat pumps in the iConnect account and to enable automatic sensor creation in Home Assistant. 
+I modified it to support multiple heat pumps in the iConnect account and enable automatic sensor creation in Home Assistant. 
 
 ## How it works
 
@@ -30,7 +30,7 @@ This project is an independent, community-driven integration and is **not offici
 
 1.  Navigate to your Home Assistant **Settings** -> **Add-ons**.
 2.  Click the **three-dot menu** in the top right corner and select **Repositories**.
-3.  Add this repository URL: `https://github.com/Macrisu/domusa-mqtt-bridge`
+3.  Add this repository URL: `https://github.com/Macrisu/domusa-mqtt-bridge-multiple`
 4.  Click **Add** and then **Close**.
 5.  Search for **Domusa MQTT Bridge** in the Add-on store and click **Install**.
 
