@@ -108,6 +108,23 @@ class Discovery:
             }
             await self._publish("sensor", f"domusa_{cid}_{uid}", payload)
 
+        # Writable Zone 1 OTC curve (P154).
+        otc_curve_number = {
+            "name": "OTC Curve",
+            "object_id": f"domusa_{cid}_otc_curve_control",
+            "unique_id": f"domusa_{cid}_otc_curve_control",
+            "device": dev_info,
+            "state_topic": status_topic,
+            "value_template": "{{ value_json.ck_zona1_p154 }}",
+            "command_topic": f"domusa/{cid}/set/setOTCCurve",
+            "min": 0.1,
+            "max": 2.0,
+            "step": 0.1,
+            "mode": "slider",
+            "icon": "mdi:chart-bell-curve",
+        }
+        await self._publish("number", f"domusa_{cid}_otc_curve_control", otc_curve_number)
+
         binary_sensors = [
             ("power", "Heat Pump Power", "on_off_p00", "mdi:power", None),
             ("otc_enabled", "OTC Enabled", "m_otc_p19", "mdi:chart-bell-curve", None),

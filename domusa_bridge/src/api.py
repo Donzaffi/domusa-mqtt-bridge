@@ -102,3 +102,15 @@ class DomusaAPI:
     async def set_acs(self, cid, temperature):
         url = f"{self.base}/v2/calderas/{cid}/estado"
         return await self._request("PUT", url, {"st_acs_p04": int(temperature)})
+
+    async def set_config_value(self, cid, key, value):
+        """Update a writable Domusa configuration parameter."""
+        url = f"{self.base}/v2/calderas/{cid}/configuracion"
+        return await self._request("PUT", url, {key: value})
+
+    async def set_otc_curve(self, cid, curve):
+        # Zone 1 OTC curve (P154). Domusa stores the value as a decimal.
+        curve = round(float(curve), 1)
+        if not 0.1 <= curve <= 2.0:
+            raise ValueError("OTC curve must be between 0.1 and 2.0")
+        return await self.set_config_value(cid, "ck_zona1_p154", curve)

@@ -29,6 +29,10 @@ class Router:
                 if key == "setACS":
                     await self.api.set_acs(cid, int(float(value)))
                     print(f"Router: DHW setpoint for {cid} changed to {value}")
+                elif key == "setOTCCurve":
+                    curve = float(value)
+                    await self.api.set_otc_curve(cid, curve)
+                    print(f"Router: OTC curve for {cid} changed to {curve}")
                 else:
                     print(f"Router: Unsupported command '{key}' for {cid}")
 
