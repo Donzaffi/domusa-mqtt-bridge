@@ -109,8 +109,12 @@ class DomusaAPI:
         return await self._request("PUT", url, {key: value})
 
     async def set_otc_curve(self, cid, curve):
-        # Zone 1 OTC curve (P154). Domusa stores the value as a decimal.
+        # Zone 1 OTC curve (P154). Only these discrete values are supported by Domusa.
+        allowed_curves = {6.0, 5.0, 4.0, 3.0, 2.5, 2.0, 1.5, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2}
         curve = round(float(curve), 1)
-        if not 0.1 <= curve <= 2.0:
-            raise ValueError("OTC curve must be between 0.1 and 2.0")
+        if curve not in allowed_curves:
+            raise ValueError(
+                f"Unsupported OTC curve {curve}. Allowed values: "
+                "6, 5, 4, 3, 2.5, 2, 1.5, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2"
+            )
         return await self.set_config_value(cid, "ck_zona1_p154", curve)

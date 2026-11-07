@@ -109,21 +109,26 @@ class Discovery:
             await self._publish("sensor", f"domusa_{cid}_{uid}", payload)
 
         # Writable Zone 1 OTC curve (P154).
-        otc_curve_number = {
-            "name": "OTC Curve",
+        # Domusa only supports the discrete values below, so expose this as a Select
+        # rather than a Number entity.
+        otc_curve_options = [
+            "K=6", "K=5", "K=4", "K=3", "K=2.5", "K=2", "K=1.5",
+            "K=1", "K=0.9", "K=0.8", "K=0.7", "K=0.6", "K=0.5",
+            "K=0.4", "K=0.3", "K=0.2",
+        ]
+        otc_curve_select = {
+            "name": "OTC Curve Control",
             "object_id": f"domusa_{cid}_otc_curve_control",
             "unique_id": f"domusa_{cid}_otc_curve_control",
             "device": dev_info,
             "state_topic": status_topic,
-            "value_template": "{{ value_json.ck_zona1_p154 }}",
+            "value_template": "K={{ value_json.ck_zona1_p154 }}",
             "command_topic": f"domusa/{cid}/set/setOTCCurve",
-            "min": 0.1,
-            "max": 2.0,
-            "step": 0.1,
-            "mode": "slider",
+            "command_template": "{{ value | replace('K=', '') }}",
+            "options": otc_curve_options,
             "icon": "mdi:chart-bell-curve",
         }
-        await self._publish("number", f"domusa_{cid}_otc_curve_control", otc_curve_number)
+        await self._publish("select", f"domusa_{cid}_otc_curve_control", otc_curve_select)
 
         binary_sensors = [
             ("power", "Heat Pump Power", "on_off_p00", "mdi:power", None),
