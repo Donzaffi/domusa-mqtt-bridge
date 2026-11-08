@@ -1,4 +1,4 @@
-# Domusa MQTT Bridge
+# Domusa MQTT Bridge - multiple devices
 
 [![GitHub Issues](https://img.shields.io/github/issues/Macrisu/domusa-mqtt-bridge-multiple)](https://github.com/Macrisu/domusa-mqtt-bridge-multiple/issues)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -69,8 +69,9 @@ Paste the code from [here](/dashboard_exemple.yaml) and use the search and repla
 
 You can find the numeric installation ID on the iConnect app or on the Working Status on your LCD.
 
-See [Picture 1](/images/dashboard1.jpg) and [Picture 2](/images/dashboard2.jpg).
+<img src="/images/dashboard1.jpg" width="800" />
 
+<img src="/images/dashboard2.jpg" width="800" />
 
 ## Support
 
