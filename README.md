@@ -57,13 +57,15 @@ poll_interval: 60
 
 You can customise your dashboard as you want, but here is an example.
 
-Go to _Settings - Dashboards - Add Dashboard (New dashboard from scratch)._
+1. Go to _Settings - Dashboards - Add Dashboard (New dashboard from scratch)._
 
 Give it a _Title_ (ex: Domusa HP) and activate _Add to sidebar._
 
-Go to the newly created Dashboard, click on the pencil icon to edit, then click on the 3 dots and select R_aw configuration editor_.
+Go to the newly created Dashboard, click on the pencil icon to edit, then click on the 3 dots and select _Raw configuration editor_.
 
 Paste the code from [here](/dashboard_exemple.yaml) and use the search and replace function in order to change **xxxxxx** to your **numeric installation ID**.
+
+2. Add the codes from [this file](/configuration.yaml) to the specific areas of your Home Assistant **configuration.yaml** file and restart Home Assistant. You can use the File Editor Add-on.
 
 You can find the numeric installation ID on the iConnect app or on the Working Status on your LCD.
 
