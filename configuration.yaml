@@ -1,0 +1,57 @@
+# 1. Add these lines to the respective sections of your configuration.yaml file for Home Assistant
+# 2. Replace using search and replace xxxxxx with your installation number from the iConnect app or the LCD Working status
+
+# =======================
+
+# mtt section
+mqtt:
+  binary_sensor:
+    - name: "xxxxxx DHW Enabled"
+      unique_id: domusa_xxxxxx_dhw_enabled
+      state_topic: "domusa/xxxxxx/status"
+      value_template: >
+        {% if value_json.m_acs_p63 | default(false) == true %}ON{% else %}OFF{% endif %}
+      payload_on: "ON"
+      payload_off: "OFF"
+      icon: mdi:water-boiler
+
+    - name: "xxxxxx DHW Preparation"
+      unique_id: domusa_xxxxxx_dhw_preparation
+      state_topic: "domusa/xxxxxx/status"
+      value_template: >
+        {% if value_json.func_hp_2 | default(false) == true %}ON{% else %}OFF{% endif %}
+      payload_on: "ON"
+      payload_off: "OFF"
+      icon: mdi:water-boiler
+
+    - name: "xxxxxx Heating Active"
+      unique_id: domusa_xxxxxx_heating_active
+      state_topic: "domusa/xxxxxx/status"
+      value_template: >
+        {% if value_json.func_hp_1 | default(false) == true %}ON{% else %}OFF{% endif %}
+      payload_on: "ON"
+      payload_off: "OFF"
+      device_class: heat
+
+    - name: "xxxxxx Defrost Active"
+      unique_id: domusa_xxxxxx_defrost_active
+      state_topic: "domusa/xxxxxx/status"
+      value_template: >
+        {% if value_json.func_hp_4_c33 | default(false) == true %}ON{% else %}OFF{% endif %}
+      payload_on: "ON"
+      payload_off: "OFF"
+      icon: mdi:snowflake-melt
+
+template:
+      - name: "Domusa Delta T"
+        unique_id: domusa_delta_t
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        availability: >
+          {{ is_number(states('sensor.xxxxxx_flow_temperature'))
+             and is_number(states('sensor.xxxxxx_return_temperature')) }}
+        state: >
+          {% set flow = states('sensor.xxxxxx_flow_temperature') | float %}
+          {% set return_temp = states('sensor.xxxxxx_return_temperature') | float %}
+          {{ (flow - return_temp) | round(1) }}
