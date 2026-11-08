@@ -10,6 +10,8 @@ This is a fork of [**Donzaffi/domusa-mqtt-bridge**](https://github.com/Donzaffi/
 
 I modified it to support multiple heat pumps in the iConnect account and automatically create sensors in Home Assistant. 
 
+You can find my Domusa heat pump parameters file [**here**](https://docs.google.com/spreadsheets/d/10L0y1GztB4zg_tBBt3k1IBSmFGTjrJcgMqfF_Y2wQH4/edit?usp=sharing).
+
 ## How it works
 
 This add-on bridges the gap between the manufacturer's cloud service and your local smart home:
