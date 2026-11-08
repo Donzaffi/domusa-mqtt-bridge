@@ -6,52 +6,80 @@
 # mtt section
 mqtt:
   binary_sensor:
-    - name: "xxxxxx DHW Enabled"
-      unique_id: domusa_xxxxxx_dhw_enabled
-      state_topic: "domusa/xxxxxx/status"
+    - name: "2510524548 DHW Enabled"
+      unique_id: domusa_2510524548_dhw_enabled
+      state_topic: "domusa/2510524548/status"
       value_template: >
         {% if value_json.m_acs_p63 | default(false) == true %}ON{% else %}OFF{% endif %}
       payload_on: "ON"
       payload_off: "OFF"
       icon: mdi:water-boiler
 
-    - name: "xxxxxx DHW Preparation"
-      unique_id: domusa_xxxxxx_dhw_preparation
-      state_topic: "domusa/xxxxxx/status"
+    - name: "2510524548 DHW Preparation"
+      unique_id: domusa_2510524548_dhw_preparation
+      state_topic: "domusa/2510524548/status"
       value_template: >
         {% if value_json.func_hp_2 | default(false) == true %}ON{% else %}OFF{% endif %}
       payload_on: "ON"
       payload_off: "OFF"
       icon: mdi:water-boiler
 
-    - name: "xxxxxx Heating Active"
-      unique_id: domusa_xxxxxx_heating_active
-      state_topic: "domusa/xxxxxx/status"
+    - name: "2510524548 Heating Active"
+      unique_id: domusa_2510524548_heating_active
+      state_topic: "domusa/2510524548/status"
       value_template: >
         {% if value_json.func_hp_1 | default(false) == true %}ON{% else %}OFF{% endif %}
       payload_on: "ON"
       payload_off: "OFF"
       device_class: heat
 
-    - name: "xxxxxx Defrost Active"
-      unique_id: domusa_xxxxxx_defrost_active
-      state_topic: "domusa/xxxxxx/status"
+    - name: "2510524548 Defrost Active"
+      unique_id: domusa_2510524548_defrost_active
+      state_topic: "domusa/2510524548/status"
       value_template: >
         {% if value_json.func_hp_4_c33 | default(false) == true %}ON{% else %}OFF{% endif %}
       payload_on: "ON"
       payload_off: "OFF"
       icon: mdi:snowflake-melt
 
+    - name: "2510524548 Backup Source Active"
+      unique_id: domusa_2510524548_backup_source_active
+      state_topic: "domusa/2510524548/status"
+      value_template: >
+        {% if value_json.salidas_hp_7_c41 | default(false) == true %}ON{% else %}OFF{% endif %}
+      payload_on: "ON"
+      payload_off: "OFF"
+      icon: mdi:fire
+
+    # Compressor is ON only when actual compressor frequency is above 0 Hz
+    - name: "2510524548 Compressor Enabled"
+      unique_id: domusa_2510524548_compressor_enabled
+      state_topic: "domusa/2510524548/status"
+      value_template: >
+        {% if value_json.freq_c15 | float(0) > 0 %}ON{% else %}OFF{% endif %}
+      payload_on: "ON"
+      payload_off: "OFF"
+      icon: mdi:engine
+
 template:
+  - sensor:
+      - name: "Compressor Demand"
+        unique_id: compressor_demand_percent
+        unit_of_measurement: "%"
+        state_class: measurement
+        state: >
+          {% set hz = states('sensor.2510524548_compressor_frequency') | float(0) %}
+          {{ [(hz / 85 * 100), 100] | min | round(1) }}
+
       - name: "Domusa Delta T"
         unique_id: domusa_delta_t
         unit_of_measurement: "°C"
         device_class: temperature
         state_class: measurement
         availability: >
-          {{ is_number(states('sensor.xxxxxx_flow_temperature'))
-             and is_number(states('sensor.xxxxxx_return_temperature')) }}
+          {{ is_number(states('sensor.2510524548_flow_temperature'))
+             and is_number(states('sensor.2510524548_return_temperature')) }}
         state: >
-          {% set flow = states('sensor.xxxxxx_flow_temperature') | float %}
-          {% set return_temp = states('sensor.xxxxxx_return_temperature') | float %}
+          {% set flow = states('sensor.2510524548_flow_temperature') | float %}
+          {% set return_temp = states('sensor.2510524548_return_temperature') | float %}
           {{ (flow - return_temp) | round(1) }}
