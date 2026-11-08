@@ -11,7 +11,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Heat Pump — Operation Status
+            heading: Operation Status
             icon: mdi:heat-pump
           - type: entities
             title: Operating Status
@@ -23,6 +23,8 @@ views:
                 name: DHW Preparation
               - entity: binary_sensor.xxxxxx_defrost_active
                 name: Defrost Active (C33)
+              - entity: binary_sensor.xxxxxx_backup_source_active
+                name: Backup Source Active (E2 / C41)
               - entity: binary_sensor.xxxxxx_compressor_enabled
                 name: Compressor
               - entity: binary_sensor.xxxxxx_zone_1_demand
@@ -81,7 +83,7 @@ views:
               - entity: sensor.xxxxxx_p06_heating_cooling_hysteresis
                 name: Heating/Cooling Hysteresis
           - type: history-graph
-            title: Flow, Return & Delta T — Last 24 Hours
+            title: Flow & Return — Last 24 Hours
             hours_to_show: 24
             refresh_interval: 60
             entities:
@@ -96,14 +98,16 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Defrost Monitoring
+            heading: Defrost & Backup Monitoring
             icon: mdi:snowflake-melt
           - type: entities
-            title: Live Defrost Status
+            title: Live Status
             show_header_toggle: false
             entities:
               - entity: binary_sensor.xxxxxx_defrost_active
                 name: Defrost Active (C33)
+              - entity: binary_sensor.xxxxxx_backup_source_active
+                name: Backup Source Active (E2 / C41)
               - entity: sensor.xxxxxx_evaporator_temperature
                 name: Evaporator Temperature
               - entity: sensor.xxxxxx_suction_temperature
@@ -114,8 +118,6 @@ views:
                 name: Compressor Frequency
               - entity: sensor.xxxxxx_fan_1_speed
                 name: Fan 1 Speed
-              - entity: sensor.xxxxxx_fan_2_speed
-                name: Fan 2 Speed
           - type: history-graph
             title: Defrost Periods (C33) — Last 24 Hours
             hours_to_show: 24
@@ -123,6 +125,13 @@ views:
             entities:
               - entity: binary_sensor.xxxxxx_defrost_active
                 name: C33 Defrost
+          - type: history-graph
+            title: Backup Source Activation (E2 / C41) — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 30
+            entities:
+              - entity: binary_sensor.xxxxxx_backup_source_active
+                name: Backup Source
       - type: grid
         cards:
           - type: heading
@@ -163,12 +172,26 @@ views:
             entities:
               - entity: sensor.xxxxxx_fan_1_speed
                 name: Fan 1 Speed
-              - entity: sensor.xxxxxx_fan_2_speed
+              - entity: sensor.2510533897_fan_1_speed
                 name: Fan 2 Speed
   - title: Diagnostics
     path: domusa-diagnostics
     icon: mdi:stethoscope
     cards:
+      - type: history-graph
+        title: Defrost Periods (C33) — Last 7 Days
+        hours_to_show: 168
+        refresh_interval: 300
+        entities:
+          - entity: binary_sensor.xxxxxx_defrost_active
+            name: C33 Defrost
+      - type: history-graph
+        title: Backup Source Activation (E2 / C41) — Last 7 Days
+        hours_to_show: 168
+        refresh_interval: 300
+        entities:
+          - entity: binary_sensor.xxxxxx_backup_source_active
+            name: Backup Source
       - type: entities
         title: Operating Diagnostics
         show_header_toggle: false
@@ -179,17 +202,12 @@ views:
             name: DHW Preparation
           - entity: binary_sensor.xxxxxx_defrost_active
             name: Defrost Active (C33)
+          - entity: binary_sensor.xxxxxx_backup_source_active
+            name: Backup Source Active (E2 / C41)
           - entity: binary_sensor.xxxxxx_compressor_enabled
             name: Compressor Enabled
           - entity: binary_sensor.xxxxxx_zone_1_demand
             name: Zone 1 Demand
-      - type: history-graph
-        title: Defrost Periods (C33) — Last 7 Days
-        hours_to_show: 168
-        refresh_interval: 300
-        entities:
-          - entity: binary_sensor.xxxxxx_defrost_active
-            name: C33 Defrost
       - type: entities
         title: Compressor Diagnostics
         show_header_toggle: false
