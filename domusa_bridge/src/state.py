@@ -12,4 +12,4 @@ class StateManager:
         payload = json.dumps(data)
         
         await self.mqtt.client.publish(topic, payload, retain=True)
-        print(f"State: Daten auf {topic} veröffentlicht.")
+        print(f"State: Data published at {topic}.")
