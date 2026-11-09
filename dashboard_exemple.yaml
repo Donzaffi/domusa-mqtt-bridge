@@ -1,9 +1,8 @@
-# Replace using search and replace xxxxxx with your installation number from the iConnect app or the LCD Working status
+title: Domusa Heat Pump
 
-title: Domusa MQTT Bridge
 views:
   - title: Overview
-    path: domusa-mqtt
+    path: domusa
     icon: mdi:heat-pump
     type: sections
     max_columns: 3
@@ -31,16 +30,6 @@ views:
                 name: Zone 1 Demand
               - entity: binary_sensor.xxxxxx_sg_ready_active
                 name: SG Ready
-          - type: entities
-            title: DHW Status
-            show_header_toggle: false
-            entities:
-              - entity: binary_sensor.xxxxxx_dhw_enabled
-                name: DHW Enabled
-              - entity: binary_sensor.xxxxxx_dhw_preparation
-                name: DHW Currently Preparing
-              - entity: sensor.xxxxxx_dhw_temperature
-                name: DHW Temperature
           - type: gauge
             entity: sensor.xxxxxx_compressor_frequency
             name: Compressor Frequency
@@ -51,6 +40,7 @@ views:
               green: 0
               yellow: 60
               red: 75
+
       - type: grid
         cards:
           - type: heading
@@ -71,19 +61,22 @@ views:
               - entity: sensor.xxxxxx_outdoor_temperature
                 name: Outdoor Temperature
           - type: entities
-            title: Heating Curve / OTC
+            title: Outdoor Temperature Compensation (OTC)
             show_header_toggle: false
             entities:
               - entity: binary_sensor.xxxxxx_otc_enabled
                 name: OTC Enabled
+              - entity: sensor.xxxxxx_otc_requested_temperature
+                name: OTC Requested Temperature
               - entity: sensor.xxxxxx_otc_curve
                 name: OTC Curve
-              - entity: sensor.xxxxxx_otc_requested_temperature
-                name: Requested Temperature
-              - entity: sensor.xxxxxx_p06_heating_cooling_hysteresis
-                name: Heating/Cooling Hysteresis
+              - entity: sensor.xxxxxx_otc_maximum_temperature
+                name: OTC Maximum Temperature
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor Temperature
+
           - type: history-graph
-            title: Flow & Return — Last 24 Hours
+            title: Flow, Return & OTC — Last 24 Hours
             hours_to_show: 24
             refresh_interval: 60
             entities:
@@ -91,14 +84,38 @@ views:
                 name: Flow
               - entity: sensor.xxxxxx_return_temperature
                 name: Return
-              - entity: sensor.domusa_delta_t
-                name: Delta T
               - entity: sensor.xxxxxx_otc_requested_temperature
-                name: Requested
+                name: OTC Requested
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor Temperature
+
       - type: grid
         cards:
           - type: heading
-            heading: Defrost & Backup Monitoring
+            heading: DHW
+            icon: mdi:water-boiler
+          - type: entities
+            title: DHW Status
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.xxxxxx_dhw_enabled
+                name: DHW Enabled
+              - entity: binary_sensor.xxxxxx_dhw_preparation
+                name: DHW Currently Preparing
+              - entity: sensor.xxxxxx_dhw_temperature
+                name: DHW Temperature
+          - type: history-graph
+            title: DHW Temperature — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.xxxxxx_dhw_temperature
+                name: DHW Temperature
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Defrost & Backup Source
             icon: mdi:snowflake-melt
           - type: entities
             title: Live Status
@@ -114,24 +131,16 @@ views:
                 name: Suction Temperature
               - entity: sensor.xxxxxx_condenser_temperature
                 name: Condensing Temperature
-              - entity: sensor.xxxxxx_compressor_frequency
-                name: Compressor Frequency
-              - entity: sensor.xxxxxx_fan_1_speed
-                name: Fan 1 Speed
           - type: history-graph
-            title: Defrost Periods (C33) — Last 24 Hours
+            title: Defrost & Backup Source — Last 24 Hours
             hours_to_show: 24
             refresh_interval: 30
             entities:
               - entity: binary_sensor.xxxxxx_defrost_active
                 name: C33 Defrost
-          - type: history-graph
-            title: Backup Source Activation (E2 / C41) — Last 24 Hours
-            hours_to_show: 24
-            refresh_interval: 30
-            entities:
               - entity: binary_sensor.xxxxxx_backup_source_active
-                name: Backup Source
+                name: E2 Backup Source
+
       - type: grid
         cards:
           - type: heading
@@ -144,20 +153,34 @@ views:
               - entity: sensor.xxxxxx_high_refrigerant_pressure
                 name: High Refrigerant Pressure
               - entity: sensor.xxxxxx_evaporator_temperature
-                name: Evaporating Temperature
+                name: Evaporator Temperature
               - entity: sensor.xxxxxx_condenser_temperature
                 name: Condensing Temperature
               - entity: sensor.xxxxxx_suction_temperature
                 name: Suction Temperature
               - entity: sensor.xxxxxx_discharge_temperature
                 name: Discharge Temperature
+          - type: history-graph
+            title: Refrigerant Temperatures — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.xxxxxx_evaporator_temperature
+                name: Evaporator
+              - entity: sensor.xxxxxx_condenser_temperature
+                name: Condenser
+              - entity: sensor.xxxxxx_suction_temperature
+                name: Suction
+              - entity: sensor.xxxxxx_discharge_temperature
+                name: Discharge
+
       - type: grid
         cards:
           - type: heading
             heading: Electrical & Fans
-            icon: mdi:lightning-bolt
+            icon: mdi:fan
           - type: entities
-            title: Electrical Measurements
+            title: Domusa Measurements
             show_header_toggle: false
             entities:
               - entity: sensor.xxxxxx_ac_voltage
@@ -166,69 +189,154 @@ views:
                 name: Compressor Current
               - entity: sensor.xxxxxx_compressor_phase_current
                 name: Compressor Phase Current
-          - type: entities
-            title: Fans
-            show_header_toggle: false
-            entities:
+              - entity: sensor.xxxxxx_compressor_frequency
+                name: Compressor Frequency
               - entity: sensor.xxxxxx_fan_1_speed
                 name: Fan 1 Speed
-              - entity: sensor.2510533897_fan_1_speed
+              - entity: sensor.xxxxxx_fan_2_speed
                 name: Fan 2 Speed
+
   - title: Diagnostics
     path: domusa-diagnostics
     icon: mdi:stethoscope
-    cards:
-      - type: history-graph
-        title: Defrost Periods (C33) — Last 7 Days
-        hours_to_show: 168
-        refresh_interval: 300
-        entities:
-          - entity: binary_sensor.xxxxxx_defrost_active
-            name: C33 Defrost
-      - type: history-graph
-        title: Backup Source Activation (E2 / C41) — Last 7 Days
-        hours_to_show: 168
-        refresh_interval: 300
-        entities:
-          - entity: binary_sensor.xxxxxx_backup_source_active
-            name: Backup Source
-      - type: entities
-        title: Operating Diagnostics
-        show_header_toggle: false
-        entities:
-          - entity: binary_sensor.xxxxxx_heating_active
-            name: Heating Active
-          - entity: binary_sensor.xxxxxx_dhw_preparation
-            name: DHW Preparation
-          - entity: binary_sensor.xxxxxx_defrost_active
-            name: Defrost Active (C33)
-          - entity: binary_sensor.xxxxxx_backup_source_active
-            name: Backup Source Active (E2 / C41)
-          - entity: binary_sensor.xxxxxx_compressor_enabled
-            name: Compressor Enabled
-          - entity: binary_sensor.xxxxxx_zone_1_demand
-            name: Zone 1 Demand
-      - type: entities
-        title: Compressor Diagnostics
-        show_header_toggle: false
-        entities:
-          - entity: sensor.xxxxxx_compressor_frequency
-            name: Frequency
-          - entity: sensor.xxxxxx_compressor_current
-            name: Current
-          - entity: sensor.xxxxxx_compressor_phase_current
-            name: Phase Current
-      - type: entities
-        title: Refrigerant Diagnostics
-        show_header_toggle: false
-        entities:
-          - entity: sensor.xxxxxx_high_refrigerant_pressure
-            name: High Pressure
-          - entity: sensor.xxxxxx_evaporator_temperature
-            name: Evaporator
-          - entity: sensor.xxxxxx_condenser_temperature
-            name: Condenser
-          - entity: sensor.xxxxxx_suction_temperature
-            name: Suction
-          - entity: sensor.xxxxxx_discharge_temperature
-            name: Discharge
+    type: sections
+    max_columns: 3
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Operating Diagnostics
+            icon: mdi:clipboard-pulse
+          - type: entities
+            title: System State
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.xxxxxx_heating_active
+                name: Heating Active
+              - entity: binary_sensor.xxxxxx_dhw_preparation
+                name: DHW Preparation
+              - entity: binary_sensor.xxxxxx_defrost_active
+                name: Defrost Active (C33)
+              - entity: binary_sensor.xxxxxx_backup_source_active
+                name: Backup Source Active (E2 / C41)
+              - entity: binary_sensor.xxxxxx_compressor_enabled
+                name: Compressor Enabled
+              - entity: binary_sensor.xxxxxx_zone_1_demand
+                name: Zone 1 Demand
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Defrost & Backup History
+            icon: mdi:chart-timeline-variant
+          - type: history-graph
+            title: Defrost & Backup Source — Last 7 Days
+            hours_to_show: 168
+            refresh_interval: 300
+            entities:
+              - entity: binary_sensor.xxxxxx_defrost_active
+                name: C33 Defrost
+              - entity: binary_sensor.xxxxxx_backup_source_active
+                name: E2 Backup Source
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Compressor Diagnostics
+            icon: mdi:engine
+          - type: entities
+            title: Compressor
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_compressor_frequency
+                name: Frequency
+              - entity: sensor.xxxxxx_compressor_current
+                name: Current
+              - entity: sensor.xxxxxx_compressor_phase_current
+                name: Phase Current
+              - entity: sensor.xxxxxx_ac_voltage
+                name: AC Voltage
+          - type: history-graph
+            title: Compressor Activity — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: binary_sensor.xxxxxx_compressor_enabled
+                name: Compressor Enabled
+              - entity: sensor.xxxxxx_compressor_frequency
+                name: Frequency
+              - entity: sensor.xxxxxx_compressor_current
+                name: Current
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Refrigerant Diagnostics
+            icon: mdi:snowflake-thermometer
+          - type: entities
+            title: Refrigerant
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_high_refrigerant_pressure
+                name: High Pressure
+              - entity: sensor.xxxxxx_evaporator_temperature
+                name: Evaporator
+              - entity: sensor.xxxxxx_condenser_temperature
+                name: Condenser
+              - entity: sensor.xxxxxx_suction_temperature
+                name: Suction
+              - entity: sensor.xxxxxx_discharge_temperature
+                name: Discharge
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: OTC Diagnostics
+            icon: mdi:chart-bell-curve
+
+          - type: entities
+            title: Outdoor Temperature Compensation
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.xxxxxx_otc_enabled
+                name: OTC Enabled
+              - entity: sensor.xxxxxx_otc_requested_temperature
+                name: Requested Temperature
+              - entity: sensor.xxxxxx_otc_curve
+                name: OTC Curve
+              - entity: sensor.xxxxxx_otc_maximum_temperature
+                name: Maximum OTC Temperature
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor Temperature
+
+          - type: history-graph
+            title: OTC Performance — Last 24 Hours
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor
+              - entity: sensor.xxxxxx_otc_requested_temperature
+                name: OTC Requested
+              - entity: sensor.xxxxxx_flow_temperature
+                name: Actual Flow
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Hydraulic Diagnostics
+            icon: mdi:pipe
+          - type: entities
+            title: Hydraulic Circuit
+            show_header_toggle: false
+            entities:
+              - entity: sensor.xxxxxx_flow_temperature
+                name: Flow Temperature
+              - entity: sensor.xxxxxx_return_temperature
+                name: Return Temperature
+              - entity: sensor.domusa_delta_t
+                name: Delta T
+              - entity: sensor.xxxxxx_water_flow
+                name: Water Flow
+              - entity: sensor.xxxxxx_outdoor_temperature
+                name: Outdoor Temperature
