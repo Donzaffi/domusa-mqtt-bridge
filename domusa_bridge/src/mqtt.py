@@ -9,7 +9,7 @@ class MQTT:
         self.client = None
 
     async def connect(self):
-        print(f"DEBUG: Verbinde mit MQTT {self.host} als User {self.user}...")
+        print(f"DEBUG: Connect with MQTT {self.host} als User {self.user}...")
         # Hier müssen user und password zwingend übergeben werden
         self.client = aiomqtt.Client(
             hostname=self.host,
