@@ -11,6 +11,9 @@ class DomusaAPI:
         if not self.token:
             self.token = await self.auth.get_token()
 
+        if not self.token:
+            return None
+
         return {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json",
@@ -19,25 +22,28 @@ class DomusaAPI:
     async def _request(self, method, url, json_data=None):
         headers = await self._get_headers()
 
-        if not self.token:
+        if not headers:
             print("ERROR: No authentication token available")
             return None
 
         try:
-            async with aiohttp.ClientSession() as session:
+            timeout = aiohttp.ClientTimeout(total=10)
+
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                # First request
                 async with session.request(
                     method,
                     url,
                     headers=headers,
                     json=json_data,
-                    timeout=10,
                 ) as response:
 
-                    # Treat both 401 and 440 as expired authentication.
+                    # Domusa may return 440 instead of 401 when the token/session
+                    # is expired. In either case, obtain a fresh token and retry once.
                     if response.status in (401, 440):
                         print(
-                            f"Authentication expired (HTTP {response.status}). "
-                            "Obtaining a new Domusa token..."
+                            f"Authentication expired or invalid "
+                            f"(HTTP {response.status}). Re-authenticating..."
                         )
 
                         self.token = await self.auth.get_token()
@@ -51,14 +57,11 @@ class DomusaAPI:
                             "Content-Type": "application/json",
                         }
 
-                        print("Retrying API request with new token...")
-
                         async with session.request(
                             method,
                             url,
                             headers=retry_headers,
                             json=json_data,
-                            timeout=10,
                         ) as retry:
 
                             if 200 <= retry.status < 300:
@@ -111,13 +114,11 @@ class DomusaAPI:
                     cid = alias
                     name = str(alias)
 
-                devices.append(
-                    {
-                        "id": str(cid),
-                        "name": str(name),
-                        "alias": str(alias),
-                    }
-                )
+                devices.append({
+                    "id": str(cid),
+                    "name": str(name),
+                    "alias": str(alias),
+                })
 
         elif isinstance(data, list):
             for index, value in enumerate(data):
@@ -136,14 +137,13 @@ class DomusaAPI:
                     or f"Domusa {index + 1}"
                 )
 
-                devices.append(
-                    {
-                        "id": str(cid),
-                        "name": str(name),
-                        "alias": str(name),
-                    }
-                )
+                devices.append({
+                    "id": str(cid),
+                    "name": str(name),
+                    "alias": str(name),
+                })
 
+        # Remove accidental duplicates while preserving API order.
         unique = []
         seen = set()
 
@@ -153,3 +153,26 @@ class DomusaAPI:
                 unique.append(device)
 
         return unique
+
+    async def get_caldera(self):
+        """Backward-compatible helper: returns the first device."""
+        devices = await self.get_calderas()
+        return devices[0] if devices else None
+
+    async def get_estado(self, cid):
+        return await self._get(
+            f"{self.base}/v2/calderas/{cid}/estado"
+        )
+
+    async def get_config(self, cid):
+        return await self._get(
+            f"{self.base}/v2/calderas/{cid}/configuracion"
+        )
+
+    async def set_acs(self, cid, temperature):
+        url = f"{self.base}/v2/calderas/{cid}/estado"
+        return await self._request(
+            "PUT",
+            url,
+            {"st_acs_p04": int(temperature)},
+        )
