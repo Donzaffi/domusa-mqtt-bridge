@@ -1,48 +1,39 @@
-import asyncio
-
 class Router:
-    def __init__(self, api, mqtt, device):
+    def __init__(self, api, mqtt, devices):
         self.api = api
         self.mqtt = mqtt
-        self.device = device
+        self.devices = {str(device["id"]): device for device in devices}
 
     async def listen(self):
-        cid = self.device["id"]
-        # Wir abonnieren alles unter .../set/
-        topic_pattern = f"domusa/{cid}/set/#"
-
-        await self.mqtt.client.subscribe(topic_pattern)
-        print(f"Router: Abonniert auf {topic_pattern}")
+        for cid in self.devices:
+            topic_pattern = f"domusa/{cid}/set/#"
+            await self.mqtt.client.subscribe(topic_pattern)
+            print(f"Router: Subscribed to {topic_pattern}")
 
         async for msg in self.mqtt.client.messages:
             try:
                 topic_str = str(msg.topic)
-                # Den Teil nach dem letzten / als Key verwenden
-                key = topic_str.split("/")[-1]
-                value = msg.payload.decode()
-                
-                print(f"Router: Nachricht empfangen auf {topic_str}: {value}")
+                parts = topic_str.split("/")
 
-                # Fall 1: Temperatur-Befehle (z.B. Heizung)
-                if key == "tempConsigna":
-                    await self.api.set_temp(cid, float(value))
-                    print(f"Router: Temperatur erfolgreich auf {value} gesetzt.")
-                
-                # Fall 2: Warmwasser-Soll-Befehl vom Thermostat (Climate-Widget)
-                elif key == "setACS":
-                    try:
-                        # Wert in Integer umwandeln
-                        new_temp = int(float(value))
-                        url = f"{self.api.base}/v2/calderas/{cid}/estado"
-                        payload = {"st_acs_p04": new_temp}
-                        
-                        async with self.api.session.put(url, json=payload) as response:
-                            if response.status == 200:
-                                print(f"Router: Warmwasser-Soll erfolgreich auf {new_temp} gesetzt.")
-                            else:
-                                print(f"Router: Fehler bei ACS-Änderung: {response.status}")
-                    except ValueError:
-                        print(f"Router: Ungültiger Wert für ACS erhalten: {value}")
+                # Expected: domusa/<device_id>/set/<command>
+                if len(parts) < 4 or parts[0] != "domusa" or parts[2] != "set":
+                    continue
+
+                cid = parts[1]
+                key = parts[-1]
+                if cid not in self.devices:
+                    continue
+
+                value = msg.payload.decode().strip()
+                print(f"Router: {cid} received {key}={value}")
+
+                # Keep the existing DHW setpoint command. OTC curve write commands
+                # are intentionally no longer supported by this bridge.
+                if key == "setACS":
+                    await self.api.set_acs(cid, int(float(value)))
+                    print(f"Router: DHW setpoint for {cid} changed to {value}")
+                else:
+                    print(f"Router: Unsupported command '{key}' for {cid}")
 
             except Exception as e:
-                print(f"Router error beim Verarbeiten von {msg.topic}: {e}")
+                print(f"Router error processing {msg.topic}: {e}")

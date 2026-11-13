@@ -1,8 +1,9 @@
 {
-  "name": "Domusa MQTT Bridge",
-  "version": "1.0.0",
+  "name": "Domusa MQTT Bridge Multiple",
+  "version": "1.2.3",
   "slug": "domusa_bridge",
-  "description": "Stable MQTT bridge for Domusa API",
+  "description": "Stable MQTT bridge for Domusa API, multiple devices",
+  "url": "https://github.com/Macrisu/domusa-mqtt-bridge/",
   "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
   "startup": "services",
   "boot": "auto",
@@ -16,7 +17,7 @@
     "mqtt_port": 1883,
     "mqtt_user": "",
     "mqtt_password": "",
-    "language": "de",
+    "language": "en",
     "poll_interval": 60
   },
   "schema": {
