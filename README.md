@@ -34,7 +34,7 @@ This project is an independent, community-driven integration and is **not offici
 
 1.  Navigate to your Home Assistant **Settings** -> **Add-ons**.
 2.  Click the **three-dot menu** in the top right corner and select **Repositories**.
-3.  Add this repository URL: `https://github.com/Macrisu/domusa-mqtt-bridge-multiple`
+3.  Add this repository URL: `https://github.com/Donzaffi/domusa-mqtt-bridge`
 4.  Click **Add** and then **Close**.
 5.  Search for **Domusa MQTT Bridge** in the Add-on store and click **Install**.
 
